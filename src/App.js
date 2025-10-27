@@ -1,5 +1,4 @@
 import { Lightning, Utils } from '@lightningjs/sdk'
-import MenuRow from './components/MenuRow/MenuRow'
 
 export default class App extends Lightning.Component {
   static getFonts() {
@@ -8,13 +7,12 @@ export default class App extends Lightning.Component {
 
   static _template() {
     return {
-      MenuRow: {
-        type: MenuRow,
+      Background: {
+        w: 1920,
+        h: 1080,
+        zIndex: -900,
+        src: Utils.asset('images/background.png'),
       },
     }
-  }
-
-  _getFocused() {
-    return this.tag('MenuRow')
   }
 }
