@@ -14,4 +14,11 @@ export const tmdbService = {
     const response = await api.get(url)
     return response.data
   },
+
+  async getPopularSeries(page = 1) {
+    const response = await api.get(TMBD_ROUTE.POPULAR_SHOWS, {
+      params: { page },
+    })
+    return response.data
+  },
 }

@@ -1,9 +1,9 @@
 import Lightning from '@lightningjs/sdk/src/Lightning'
 import { Utils } from '@lightningjs/sdk'
-import { CardItem, HorizontalContainer, NavBar, VerticalContainer } from '../components'
+import { NavBar, VerticalContainer } from '../components'
 import { ELEMENTS } from '../utils/Elements'
 import { Widget } from './components'
-import { tmdbService } from '../service/tmbdService'
+import { fetchHomeData } from '../service/fetchHomeData'
 
 export default class Home extends Lightning.Component {
   _focusedComponent = ELEMENTS.NAVBAR
@@ -35,56 +35,12 @@ export default class Home extends Lightning.Component {
   }
 
   async _init() {
-    try {
-      const moviesData = await tmdbService.getNowPlayingMovies()
-      const data = moviesData.results.slice(0, 5).map((movie) => ({
-        title: movie.title,
-        image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-      }))
-
-      console.log(data)
-
-      const cardItems = data.map((item) => ({
-        type: CardItem,
-        item,
-      }))
-
-      const rows = [
-        {
-          type: HorizontalContainer,
-          w: 1241,
-          h: 464,
-          props: {
-            items: cardItems,
-            railTitle: ELEMENTS.MOVIES,
-            h: 359,
-            titleFontFace: 'Inter-Bold',
-            titleFontSize: 24,
-          },
-        },
-        {
-          type: HorizontalContainer,
-          w: 1241,
-          h: 464,
-          props: {
-            items: cardItems,
-            railTitle: ELEMENTS.SERIES,
-            h: 359,
-            titleFontFace: 'Inter-Bold',
-            titleFontSize: 24,
-          },
-        },
-      ]
-
-      this.tag(ELEMENTS.WRAPPER).patch({
-        props: {
-          items: rows,
-        },
-      })
-    } catch (error) {
-      console.error('Failed to fetch movies:', error)
-      // Optionally show error UI or use fallback data
-    }
+    const rows = await fetchHomeData()
+    this.tag(ELEMENTS.WRAPPER).patch({
+      props: {
+        items: rows,
+      },
+    })
   }
 
   set background(data) {
