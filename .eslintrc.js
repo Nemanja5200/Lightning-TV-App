@@ -11,6 +11,7 @@ module.exports = {
     quotes: [2, 'single', 'avoid-escape'],
     semi: [2, 'never'],
     'no-extra-boolean-cast': 'off',
+    'no-dupe-class-members': 'off',
     'no-unused-vars': [
       1,
       {
@@ -31,7 +32,7 @@ module.exports = {
   },
   parserOptions: {
     parser: 'babel-eslint',
-    ecmaVersion: 2018,
+    ecmaVersion: 'latest',
     sourceType: 'module',
   },
 }

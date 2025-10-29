@@ -1,14 +1,24 @@
 {
   "appSettings": {
+    "enablePointer": true,
     "stage": {
       "clearColor": "0x00000000",
-      "useImageWorker": true
+      "useImageWorker": false,
+      "w": 1920,
+      "h": 1080,
+      "precision": 1,
+      "readPixelsAfterDraw": true,
+      "pauseRafLoopOnIdle": true,
+      "defaultFontFace": "Montserrat-Regular"
     },
-    "debug": false
+    "debug": false,
+    "keys": {}
   },
   "platformSettings": {
     "path": "./static",
-    "log": true,
-    "showVersion": true
+    "log": false,
+    "showVersion": false,
+    "inspector": true,
+    "debugger": true
   }
 }

@@ -1,23 +1,22 @@
-import Lightning from '@lightningjs/sdk/src/Lightning'
-import { getClosestElementIndex } from '../../utils/focus'
-import { CARD_TYPES } from '../../constants/globalConstants'
+import { Lightning } from '@lightningjs/sdk'
 
 export default class VerticalContainer extends Lightning.Component {
   _props = {
     items: [],
-    carryRowPosition: true,
-    enableScroll: true,
+    title: '',
+    enableScroll: false,
   }
-  _focusedIndex = -1
+  _focusedIndex = 0
   _scrollPosition = 0
 
   static _template() {
     return {
+      flex: { direction: 'column' },
+      Title: {
+        visible: false,
+      },
       Items: {
-        w: (w) => w,
-        flex: {
-          direction: 'column',
-        },
+        flex: { direction: 'column' },
       },
     }
   }
@@ -26,149 +25,121 @@ export default class VerticalContainer extends Lightning.Component {
     return this.tag('Items')
   }
 
-  get _focusedIndex() {
-    return this._focusedIndex
+  get Title() {
+    return this.tag('Title')
   }
 
-  set _focusedIndex(val) {
-    this._focusedIndex = val
-  }
-
-  /**
-   * @param {{ items: any[]; carryRowPosition: boolean; }} props
-   */
   set props(props) {
-    let { items, ...rest } = props
+    const { items, title, w, h, ...rest } = props
     this._props = { ...this._props, ...rest }
 
-    if (items !== this._props.items) {
-      items &&
-        items[0]?.type?.name === 'HorizontalContainer' &&
-        (items = items.map((item) => {
-          return {
-            ...item,
-            props: {
-              ...item.props,
-              parentState: this._props.parentState,
-            },
-          }
-        }))
-      this._props = { ...this._props, items }
+    if (w) this.patch({ w })
+    if (h) this.patch({ h })
 
-      this._focusedIndex = -1
-      this.Items.y = 0
+    if (title && title !== '') {
+      this.Title.patch({
+        visible: true,
+        flexItem: { marginBottom: 20 },
+        text: {
+          text: title,
+          fontSize: 40,
+          fontFace: 'Montserrat-Medium',
+          textColor: 0xffffffff,
+        },
+      })
+    } else {
+      this.Title.patch({ visible: false })
+    }
 
+    if (items && items !== this._props.items) {
+      this._props.items = items
       this.Items.childList.clear()
-      if (items?.length > 0) {
-        this.Items.childList.a(items)
 
-        this.stage.update()
+      if (items.length > 0) {
+        this.Items.childList.a(items)
+        this._focusedIndex = 0
+      } else {
+        this._focusedIndex = -1
       }
 
-      this._focusedIndex = items && items.length > 0 ? 0 : -1
       this._scrollPosition = 0
+      this.Items.patch({ y: 0 })
     }
+
+    this.stage.update()
   }
 
   _getFocused() {
     return this.Items?.children?.[this._focusedIndex]
   }
 
-  throttle(func, limit) {
-    let inThrottle
-    return function () {
-      const args = arguments
-      const context = this
-      if (!inThrottle) {
-        func.apply(context, args)
-        inThrottle = true
-        setTimeout(() => (inThrottle = false), limit)
-      }
-    }
-  }
+  _reCalibrateScroll() {
+    if (!this._props.enableScroll || !this.h) return
 
-  handleDownEPG = this.throttle(() => {
-    const { items } = this._props
+    this.stage.update()
 
-    if (this._focusedIndex < items.length - 1) {
-      this._handleCarryFocus(this._focusedIndex, this._focusedIndex + 1)
-      this._reCalibrateScroll(this._focusedIndex, this._focusedIndex + 1)
-      this._focusedIndex += 1
-      this.fireAncestors('$verticalContainerIndexChange', this._focusedIndex)
-    } else {
-      return false
-    }
-    return true
-  }, 50)
+    const currentFocus = this.Items.children[this._focusedIndex]
+    if (!currentFocus) return
 
-  _handleScroll(event) {
-    if (this.hasFocus()) {
-      if (event.deltaY > 0) {
-        const { items } = this._props
-        if (items && items[0].channelId) {
-          return this.handleDownEPG()
-        } else {
-          return this.handleDown()
-        }
-      } else if (event.deltaY < 0) {
-        if (this._focusedIndex === 0) {
-          this.fireAncestors('$setStateOnScroll', 'Hero')
-        } else {
-          return this.handleUp()
-        }
-      }
+    const containerHeight = this.finalH
+    const itemY = currentFocus.finalY
+    const itemH = currentFocus.finalH
+
+    const itemBottom = itemY + itemH + this.Items.y
+    const itemTop = itemY + this.Items.y
+
+    if (itemBottom > containerHeight) {
+      this._scrollPosition -= itemBottom - containerHeight + 20
+      this.Items.smooth = { y: this._scrollPosition }
+    } else if (itemTop < 0) {
+      this._scrollPosition -= itemTop - 20
+      this.Items.smooth = { y: this._scrollPosition }
     }
   }
 
   _handleDown() {
     const { items } = this._props
-    if (items && items[0].channelId) {
-      return this.handleDownEPG()
-    } else {
-      return this.handleDown()
+    if (this._focusedIndex < items.length - 1) {
+      this.Items.children[this._focusedIndex]?._unfocus()
+      this._focusedIndex += 1
+      this.Items.children[this._focusedIndex]?._focus()
+      this._reCalibrateScroll()
+      return true
     }
-  }
-
-  handleDown() {
-    if (this._focusedIndex < this.Items.children.length - 1) {
-      if (this.Items.children[this._focusedIndex + 1]._props?.cardType === CARD_TYPES.BANNER) {
-        this._handleCarryFocus(this._focusedIndex, this._focusedIndex + 2)
-        this._reCalibrateScroll(this._focusedIndex, this._focusedIndex + 2)
-        this._focusedIndex += 2
-        this.fireAncestors('$verticalContainerIndexChange', this._focusedIndex)
-      } else {
-        this._handleCarryFocus(this._focusedIndex, this._focusedIndex + 1)
-        this._reCalibrateScroll(this._focusedIndex, this._focusedIndex + 1)
-        this._focusedIndex += 1
-        this.fireAncestors('$verticalContainerIndexChange', this._focusedIndex, this.ref)
-      }
-    } else {
-      return false
-    }
-    return true
-  }
-
-  handleUp() {
-    if (this._focusedIndex > 0) {
-      if (this.Items.children[this._focusedIndex - 1]._props?.cardType === CARD_TYPES.BANNER) {
-        this._handleCarryFocus(this._focusedIndex, this._focusedIndex - 2)
-        this._reCalibrateScroll(this._focusedIndex, this._focusedIndex - 2)
-        this._focusedIndex -= 2
-        this.fireAncestors('$verticalContainerIndexChange', this._focusedIndex)
-      } else {
-        this._handleCarryFocus(this._focusedIndex, this._focusedIndex - 1)
-        this._reCalibrateScroll(this._focusedIndex, this._focusedIndex - 1)
-        this._focusedIndex -= 1
-        this.fireAncestors('$verticalContainerIndexChange', this._focusedIndex)
-      }
-    } else {
-      return false
-    }
-    return true
+    return false
   }
 
   _handleUp() {
-    return this.handleUp()
+    if (this._focusedIndex > 0) {
+      this.Items.children[this._focusedIndex]?._unfocus()
+      this._focusedIndex -= 1
+      this.Items.children[this._focusedIndex]?._focus()
+      this._reCalibrateScroll()
+      return true
+    }
+    return false
+  }
+
+  _handleLeft() {
+    return false
+  }
+
+  _handleRight() {
+    return false
+  }
+
+  _focus() {
+    const { items } = this._props
+    if (this._focusedIndex >= 0 && this._focusedIndex < items.length) {
+      this.Items.children[this._focusedIndex]?._focus()
+    }
+  }
+
+  _unfocus() {
+    const { items } = this._props
+    if (this._focusedIndex >= 0 && this._focusedIndex < items.length) {
+      this.Items.children[this._focusedIndex]?._unfocus()
+    }
   }
 
   _appendItems(items) {
@@ -176,24 +147,7 @@ export default class VerticalContainer extends Lightning.Component {
       this._props.items.push(item)
       this.Items.childList.a(item)
     })
-
     this.stage.update()
-  }
-
-  _removeLastItems(count) {
-    const { items } = this._props
-
-    if (items.length >= count) {
-      // Remove last `count` items from _props.items
-      this._props.items.splice(-count, count)
-
-      // Remove last `count` items from the visual container
-      for (let i = 0; i < count; i++) {
-        this.Items.childList.removeAt(this.Items.children.length - 1)
-      }
-
-      this.stage.update()
-    }
   }
 
   _clear() {
@@ -203,70 +157,5 @@ export default class VerticalContainer extends Lightning.Component {
     this._scrollPosition = 0
     this.Items.y = 0
     this.stage.update()
-  }
-
-  /**
-   * move items container to the side if there are more items off the screen
-   * @param {number} oldIndex
-   * @param {number} newIndex
-   */
-  _reCalibrateScroll(oldIndex, newIndex) {
-    const { enableScroll } = this._props
-    if (!enableScroll) return
-
-    this.stage.update()
-
-    const currentFocus = this.Items.children[newIndex]
-    const prevFocus = this.Items.children[oldIndex]
-
-    if (!currentFocus) {
-      return
-    }
-
-    if (newIndex === 0) {
-      this._scrollPosition = 0
-      this.Items.patch({ y: 0 })
-    } else {
-      const multiplier = oldIndex - newIndex
-      this._scrollPosition += multiplier * prevFocus.finalH
-      this.Items.patch({
-        y: Math.min(this.finalH / 2 - currentFocus.finalH / 2 + this._scrollPosition, 0),
-      })
-    }
-
-    this.Items.children[oldIndex]?._unfocus()
-    this.Items.children[newIndex]?._focus()
-  }
-
-  $handleItemHover(index) {
-    if (this._focusedIndex !== index) {
-      this.Items.children[this._focusedIndex]?._unfocus()
-      this._focusedIndex = index
-    }
-    this.fireAncestors('$verticalContainerIndexChange', index)
-    this._reCalibrateScroll()
-    this.fireAncestors(
-      '$handleStateHover',
-      this.parent.children.indexOf(this),
-      this._props.parentState,
-    )
-  }
-
-  /**
-   * carry the focus to next container
-   * @param {number} oldIndex
-   * @param {number} newIndex
-   */
-  _handleCarryFocus(oldIndex, newIndex, closestElementFunction = getClosestElementIndex) {
-    if (this._props.carryRowPosition && this.Items.children.length > 1) {
-      const nextContainer = this.Items.children[newIndex]
-      if (nextContainer.Items) {
-        const previousContainer = this.Items.children[oldIndex]
-        const previouslyFocusedItem =
-          previousContainer.Items.children[previousContainer._focusedIndex]
-
-        nextContainer._setFocusedIndex(closestElementFunction(nextContainer, previouslyFocusedItem))
-      }
-    }
   }
 }

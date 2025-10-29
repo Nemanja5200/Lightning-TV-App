@@ -1,21 +1,19 @@
 // HorizontalContainer.js
 import Lightning from '@lightningjs/sdk/src/Lightning'
 import { clamp } from '../../utils/index'
-import { CARD_TYPES } from '../../constants/globalConstants'
-
+import { Colors } from '@lightningjs/sdk'
 export default class HorizontalContainer extends Lightning.Component {
   _props = {
     items: [],
     paddingLeft: 0,
     disableScroll: false,
-    parentState: null,
   }
   _focusedIndex = -1
   _scrollPosition = 0
 
   static _template() {
     return {
-      flex: { direction: 'column', wrap: true },
+      flex: { direction: 'row', wrap: true },
       Title: {},
       Items: {
         y: 0,
@@ -57,38 +55,42 @@ export default class HorizontalContainer extends Lightning.Component {
 
   _setFocusedIndex(newIndex) {
     this._focusedIndex = clamp(newIndex, 0, this._props.items.length - 1)
+    //this._focusedIndex = newIndex;
     this._reCalibrateScroll()
     this.fireAncestors('$horizontalContainerIndexChange', this._focusedIndex, this._scrollPosition)
   }
 
   set props(props) {
-    const { items, railTitle, parentState, ...rest } = props
+    const { items, railTitle, ...rest } = props
 
-    this._props = { ...this._props, ...rest, parentState }
+    this._props = { ...this._props, ...rest }
 
     const { cardType, targetIndex } = rest
 
     if (railTitle && railTitle !== '') {
       const { h } = rest
+      this.Items.patch({
+        y: 0,
+      })
       this.patch({
         h: h + 95,
         Title: {
-          x: 9,
-          y: 10,
-          h: 55,
+          x: 0,
+          y: 0,
+          // h: 55,
           text: {
             text: railTitle,
-            fontFace: 'Montserrat-Bold',
-            fontSize: 32,
+            fontFace: 'Montserrat-Medium',
+            fontSize: 40,
+            textColor: Colors('#fff').get(),
             lineHeight: 39,
+            textTransform: 'uppercase',
           },
-        },
-        Items: {
-          y: 0,
         },
       })
     } else {
-      this.patch({ ...rest, Items: { h: rest.h } })
+      this.patch({ ...rest })
+      this.Items.patch({ h: rest.h })
     }
 
     this.patch({
@@ -110,14 +112,15 @@ export default class HorizontalContainer extends Lightning.Component {
       } else {
         this._focusedIndex = items?.length > 0 ? 0 : -1
       }
-
-      if (cardType === CARD_TYPES.EPG_CARD_ITEM) {
+      // todo: change to paddingLeft
+      if (cardType === 'EPG_CARD_ITEM') {
         this.Items.children[0].patch({
           flex: {
             paddingLeft: this._props.paddingLeft,
           },
         })
 
+        //todo: check
         this._scrollPosition = this._props.paddingLeft + this.w || 0
       }
     }
@@ -137,39 +140,17 @@ export default class HorizontalContainer extends Lightning.Component {
 
       if (!currentFocus) return
 
-      let isChildLive = false
-      let scrollOffsetLive = 0
-      if (
-        this.Items.children[this._focusedIndex]._props.extensions &&
-        this.Items.children[this._focusedIndex]._props.extensions.end_time
-      ) {
-        const currentTime = new Date()
-        const startTime = new Date(
-          this.Items.children[this._focusedIndex]._props.extensions.start_time,
-        )
-        const endTime = new Date(this.Items.children[this._focusedIndex]._props.extensions.end_time)
-        isChildLive = startTime < currentTime && currentTime < endTime
-
-        scrollOffsetLive = ((currentTime - startTime) / (1000 * 60)) * 8.33 + 10
-      }
-
       const containerFinalWidth = this.finalW
       const elementX = currentFocus.finalX
       const elementW = currentFocus.finalW
 
-      if (isChildLive && elementW > containerFinalWidth) {
-        return
-      } else if (elementX < -this._scrollPosition) {
+      if (elementX < -this._scrollPosition) {
         // paddingOffset is used to offset first item in each
         // column from the start of the container in EPG-s
-        const paddingOffset = currentFocus.flex?._paddingLeft
-          ? currentFocus.flex?._paddingLeft
-          : this._focusedIndex !== 0
-          ? -50
-          : -10
+        const paddingOffset = currentFocus.flex?._paddingLeft ?? 0
         this._scrollPosition = -elementX - paddingOffset
       } else if (elementX + elementW > containerFinalWidth - this._scrollPosition) {
-        this._scrollPosition = -(elementX + elementW - containerFinalWidth + 20)
+        this._scrollPosition = -(elementX + elementW - containerFinalWidth)
       }
 
       this.Items.smooth = { x: this._scrollPosition }
@@ -185,21 +166,51 @@ export default class HorizontalContainer extends Lightning.Component {
   }
 
   _handleUp() {
+    console.log('handle up')
     return false
   }
 
+  _handleHover() {
+    let verticalState
+
+    const parentContainer = this.parent.parent.ref
+    const indexForVC = this.parent.children.indexOf(this)
+    const constructorName = this.Items.children[this._focusedIndex]?.constructor.name
+
+    if (constructorName === 'PosterRailItem' && parentContainer === 'VODSection') {
+      //case for search page
+      verticalState = 'VODSection'
+    }
+    if (constructorName === 'PosterRailItem' && parentContainer !== 'VODSection') {
+      verticalState = 'VodContainer'
+    }
+    if (constructorName === 'SportsEventsRailItem') {
+      verticalState = 'VodContentContainer'
+    }
+    if (constructorName === 'LandscapeRailItem') {
+      verticalState = 'Items'
+    }
+    if (constructorName === 'EPGRailItems') {
+      verticalState = 'EPGS'
+    }
+
+    this.fireAncestors('$horizontalContainerPosterIndexChange', indexForVC, verticalState)
+  }
+
   _handleRight() {
+    //this.Items.children[this._focusedIndex]._unfocus();
     const { items } = this._props
     if (this._focusedIndex < items.length - 1) {
       this.Items.children[this._focusedIndex]._unfocus()
       this._focusedIndex += 1
-      this.Items.children[this._focusedIndex]?._focus()
-      this._reCalibrateScroll()
+      // this._reCalibrateScroll();
       this.fireAncestors(
         '$horizontalContainerIndexChange',
         this._focusedIndex,
         this._scrollPosition,
       )
+
+      console.log('right clicked')
     } else {
       return false
     }
@@ -207,11 +218,11 @@ export default class HorizontalContainer extends Lightning.Component {
   }
 
   _handleLeft() {
+    //this.Items.children[this._focusedIndex]._unfocus();
     if (this._focusedIndex > 0) {
       this.Items.children[this._focusedIndex]?._unfocus()
       this._focusedIndex -= 1
-      this.Items.children[this._focusedIndex]?._focus()
-      this._reCalibrateScroll()
+      // this._reCalibrateScroll();
       this.fireAncestors(
         '$horizontalContainerIndexChange',
         this._focusedIndex,
@@ -223,34 +234,12 @@ export default class HorizontalContainer extends Lightning.Component {
     return true
   }
 
-  $handleItemHover(index) {
-    if (this._focusedIndex !== index) {
-      this.Items.children[this._focusedIndex]?._unfocus()
-      this._focusedIndex = index
+  _handleEnter() {
+    console.log('handled enter')
+    const focusedItem = this.Items.children[this._focusedIndex]
+    if (focusedItem) {
+      focusedItem.signal('select')
     }
-    this._reCalibrateScroll()
-    this.parent.parent.type &&
-    (this.parent.parent.type.name === 'VerticalContainer' ||
-      this.parent.parent.type.name === 'EPGContainer')
-      ? this.fireAncestors('$handleItemHover', this.parent.children.indexOf(this))
-      : this.fireAncestors(
-          '$handleStateHover',
-          this.parent.children.indexOf(this),
-          this._props.parentState,
-        )
-  }
-
-  _focus() {
-    const { items } = this._props
-    if (this._focusedIndex >= 0 && this._focusedIndex < items.length) {
-      this.Items.children[this._focusedIndex]?._focus()
-    }
-  }
-
-  _unfocus() {
-    const { items } = this._props
-    if (this._focusedIndex >= 0 && this._focusedIndex < items.length) {
-      this.Items.children[this._focusedIndex]?._unfocus()
-    }
+    return true
   }
 }
