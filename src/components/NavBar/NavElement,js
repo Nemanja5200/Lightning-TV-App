@@ -1,5 +1,5 @@
 import { Lightning } from '@lightningjs/sdk'
-import { TEXT_COLORS } from '../../utils/Colors'
+import { COLORS } from '../../utils/Colors'
 
 export default class NavElement extends Lightning.Component {
   static _template() {
@@ -10,7 +10,7 @@ export default class NavElement extends Lightning.Component {
         text: {
           fontSize: 24,
           fontFace: 'Inter-Bold',
-          textColor: TEXT_COLORS.GRAY,
+          textColor: COLORS.GRAY,
         },
       },
     }
@@ -31,21 +31,24 @@ export default class NavElement extends Lightning.Component {
 
   _focus() {
     this.stage.update()
+    const labelWidth = this.tag('Label').renderWidth
+    const extraPadding = 20
     this.patch({
       Label: {
         text: {
-          textColor: TEXT_COLORS.WHITE,
+          textColor: COLORS.WHITE,
         },
       },
     })
 
     this.patch({
       Underline: {
-        y: 45,
-        w: this.tag('Label').renderWidth,
+        x: -extraPadding,
+        y: 38,
+        w: labelWidth + extraPadding * 2,
         h: 4,
         rect: true,
-        color: TEXT_COLORS.RED,
+        color: COLORS.RED,
       },
     })
   }
@@ -54,7 +57,7 @@ export default class NavElement extends Lightning.Component {
     this.patch({
       Label: {
         text: {
-          textColor: TEXT_COLORS.GRAY,
+          textColor: COLORS.GRAY,
         },
       },
     })

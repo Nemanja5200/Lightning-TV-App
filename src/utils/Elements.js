@@ -5,4 +5,6 @@ export const ELEMENTS = {
   SERIES: 'Series',
   WRAPPER: 'Wrapper',
   BACKGROUND: 'Background',
+  WIDGETCARD: 'WidgetCard',
+  WIDGET: 'Widget',
 }

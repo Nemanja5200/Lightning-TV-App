@@ -1,6 +1,6 @@
 import { Utils } from '@lightningjs/sdk'
 import Lightning from '@lightningjs/sdk/src/Lightning'
-import { TEXT_COLORS } from '../../utils/Colors'
+import { COLORS } from '../../utils/Colors'
 
 export default class CardItem extends Lightning.Component {
   static _template() {
@@ -12,7 +12,7 @@ export default class CardItem extends Lightning.Component {
         fontSize: 24,
         fontFace: 'Inter-Regular',
       },
-      color: TEXT_COLORS.TRANSPARENT,
+      color: COLORS.TRANSPARENT,
       flexItem: {
         marginRight: 24,
       },
@@ -25,7 +25,7 @@ export default class CardItem extends Lightning.Component {
       },
       Label: {
         y: 0,
-        color: TEXT_COLORS.GRAY,
+        color: COLORS.GRAY,
         text: {
           fontSize: 28,
         },
@@ -49,7 +49,7 @@ export default class CardItem extends Lightning.Component {
       strokeColor: 0xffff0000,
     }
     this.tag('Label').patch({
-      color: TEXT_COLORS.WHITE,
+      color: COLORS.WHITE,
     })
   }
 
@@ -61,7 +61,7 @@ export default class CardItem extends Lightning.Component {
       strokeColor: 0x00000000,
     }
     this.tag('Label').patch({
-      color: TEXT_COLORS.GRAY,
+      color: COLORS.GRAY,
     })
   }
 }

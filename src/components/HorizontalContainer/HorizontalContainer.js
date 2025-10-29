@@ -61,7 +61,7 @@ export default class HorizontalContainer extends Lightning.Component {
   }
 
   set props(props) {
-    const { items, railTitle, ...rest } = props
+    const { items, railTitle, titleFontSize, titleFontFace, titleColor, ...rest } = props
 
     this._props = { ...this._props, ...rest }
 
@@ -77,12 +77,12 @@ export default class HorizontalContainer extends Lightning.Component {
         Title: {
           x: 0,
           y: 0,
-          // h: 55,
+          h: 55,
           text: {
             text: railTitle,
-            fontFace: 'Montserrat-Medium',
-            fontSize: 40,
-            textColor: Colors('#fff').get(),
+            fontFace: titleFontFace || 'Montserrat-Bold',
+            fontSize: titleFontSize || 32,
+            textColor: titleColor || Colors('#fff').get(),
             lineHeight: 39,
             textTransform: 'uppercase',
           },
@@ -166,7 +166,6 @@ export default class HorizontalContainer extends Lightning.Component {
   }
 
   _handleUp() {
-    console.log('handle up')
     return false
   }
 
@@ -209,8 +208,6 @@ export default class HorizontalContainer extends Lightning.Component {
         this._focusedIndex,
         this._scrollPosition,
       )
-
-      console.log('right clicked')
     } else {
       return false
     }
@@ -235,7 +232,6 @@ export default class HorizontalContainer extends Lightning.Component {
   }
 
   _handleEnter() {
-    console.log('handled enter')
     const focusedItem = this.Items.children[this._focusedIndex]
     if (focusedItem) {
       focusedItem.signal('select')
