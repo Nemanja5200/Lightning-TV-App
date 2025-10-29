@@ -1,9 +1,9 @@
 import Lightning from '@lightningjs/sdk/src/Lightning'
 import { Utils } from '@lightningjs/sdk'
-import { NavBar, VerticalContainer } from '../components'
-import { ELEMENTS } from '../utils/Elements'
-import { Widget } from './components'
-import { fetchHomeData } from '../service/fetchHomeData'
+import { Widget } from '../components'
+import { ELEMENTS } from '../../utils/Elements'
+import { fetchHomeData } from '../../service/fetchHomeData'
+import { NavBar, VerticalContainer } from '../../components'
 
 export default class Home extends Lightning.Component {
   _focusedComponent = ELEMENTS.NAVBAR
@@ -35,6 +35,10 @@ export default class Home extends Lightning.Component {
   }
 
   async _init() {
+    this.tag('Background').patch({
+      src: Utils.asset('images/background.png'),
+    })
+
     const rows = await fetchHomeData()
     this.tag(ELEMENTS.WRAPPER).patch({
       props: {

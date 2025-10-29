@@ -1,7 +1,7 @@
-import { Lightning, Utils } from '@lightningjs/sdk'
-import Home from './pages/Home'
+import { Router, Utils } from '@lightningjs/sdk'
+import routes from './lib/Routes'
 
-export default class App extends Lightning.Component {
+export default class App extends Router.App {
   static getFonts() {
     return [
       { family: 'Inter-Regular', url: Utils.asset('fonts/Inter-Regular.ttf') },
@@ -11,18 +11,29 @@ export default class App extends Lightning.Component {
 
   static _template() {
     return {
-      Home: { type: Home },
+      ...super._template(),
     }
   }
 
-  _init() {
-    this.tag('Home').background = {
-      image: 'images/background.png',
-      zIndex: -1,
-    }
+  _setup() {
+    Router.startRouter(routes, this)
   }
 
   _getFocused() {
-    return this.tag('Home')
+    return Router.getActivePage()
+  }
+
+  $navItemSelected(label) {
+    console.log('Navigating to:', label)
+
+    const routeMap = {
+      Home: 'home',
+      Movies: 'movies',
+    }
+
+    const route = routeMap[label]
+    if (route) {
+      Router.navigate(route)
+    }
   }
 }
