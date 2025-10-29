@@ -35,8 +35,11 @@ export default class CardItem extends Lightning.Component {
 
   set item(data) {
     this._item = data
+
+    const imageSrc = data.image.startsWith('http') ? data.image : Utils.asset(data.image)
+
     this.patch({
-      Image: { src: Utils.asset(data.image) },
+      Image: { src: imageSrc },
       Label: { text: { text: data.title } },
     })
   }

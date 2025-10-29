@@ -19,15 +19,6 @@ export default class Widget extends Lightning.Component {
         justifyContent: 'center',
         alignItems: 'center',
       },
-      Title: {
-        flexItem: { marginBottom: 24, marginTop: 35 },
-        text: {
-          text: 'Top 5 Channels',
-          fontFace: 'Inter-Bold',
-          fontSize: 28,
-          textColor: COLORS.WHITE,
-        },
-      },
       WidgetCards: {
         type: VerticalContainer,
       },
@@ -48,6 +39,12 @@ export default class Widget extends Lightning.Component {
     this.tag('WidgetCards').patch({
       props: {
         items: cardItems,
+        title: 'Top 5 Channels',
+        titleFontFace: 'Inter-Bold',
+        titleFontSize: 28,
+        titleColor: COLORS.WHITE,
+        titleAlign: 'center',
+        titleMarginTop: 50,
         w: 280,
         h: 'auto',
       },

@@ -22,8 +22,8 @@ export default class WidgetCard extends Lightning.Component {
       Title: {
         text: {
           fontSize: 16,
-          fontFace: 'Inter-Regular',
-          textColor: COLORS.WHITE,
+          titleFontFace: 'Inter-Regular',
+          titleColor: COLORS.WHITE,
         },
       },
     }

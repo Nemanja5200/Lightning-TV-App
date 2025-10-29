@@ -30,23 +30,60 @@ export default class VerticalContainer extends Lightning.Component {
   }
 
   set props(props) {
-    const { items, title, w, h, ...rest } = props
+    const {
+      items,
+      title,
+      w,
+      h,
+      titleFontSize,
+      titleFontFace,
+      titleColor,
+      titleMarginBottom,
+      titleMarginTop,
+      titleAlign,
+      ...rest
+    } = props
+
     this._props = { ...this._props, ...rest }
 
     if (w) this.patch({ w })
     if (h) this.patch({ h })
 
     if (title && title !== '') {
+      const alignment = titleAlign || 'left'
+      const marginBottom = titleMarginBottom !== undefined ? titleMarginBottom : 20
+      const marginTop = titleMarginTop !== undefined ? titleMarginTop : 0
+
       this.Title.patch({
         visible: true,
-        flexItem: { marginBottom: 20 },
+        flexItem: {
+          marginBottom: marginBottom,
+          marginTop: marginTop,
+        },
         text: {
           text: title,
-          fontSize: 40,
-          fontFace: 'Montserrat-Medium',
-          textColor: 0xffffffff,
+          fontSize: titleFontSize || 40,
+          fontFace: titleFontFace || 'Montserrat-Medium',
+          textColor: titleColor || 0xffffffff,
         },
       })
+
+      if (alignment === 'center' && w) {
+        this.Title.patch({
+          mount: 0.5,
+          x: w / 2,
+        })
+      } else if (alignment === 'right' && w) {
+        this.Title.patch({
+          mount: 1,
+          x: w,
+        })
+      } else {
+        this.Title.patch({
+          mount: 0,
+          x: 0,
+        })
+      }
     } else {
       this.Title.patch({ visible: false })
     }
@@ -75,19 +112,14 @@ export default class VerticalContainer extends Lightning.Component {
 
   _reCalibrateScroll() {
     if (!this._props.enableScroll || !this.h) return
-
     this.stage.update()
-
     const currentFocus = this.Items.children[this._focusedIndex]
     if (!currentFocus) return
-
     const containerHeight = this.finalH
     const itemY = currentFocus.finalY
     const itemH = currentFocus.finalH
-
     const itemBottom = itemY + itemH + this.Items.y
     const itemTop = itemY + this.Items.y
-
     if (itemBottom > containerHeight) {
       this._scrollPosition -= itemBottom - containerHeight + 20
       this.Items.smooth = { y: this._scrollPosition }

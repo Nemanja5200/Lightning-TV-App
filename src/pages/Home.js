@@ -3,6 +3,7 @@ import { Utils } from '@lightningjs/sdk'
 import { CardItem, HorizontalContainer, NavBar, VerticalContainer } from '../components'
 import { ELEMENTS } from '../utils/Elements'
 import { Widget } from './components'
+import { tmdbService } from '../service/tmbdService'
 
 export default class Home extends Lightning.Component {
   _focusedComponent = ELEMENTS.NAVBAR
@@ -33,52 +34,57 @@ export default class Home extends Lightning.Component {
     }
   }
 
-  _init() {
-    const data = [
-      { title: 'Movie 1', image: 'images/movie1.png' },
-      { title: 'Movie 2', image: 'images/movie1.png' },
-      { title: 'Movie 3', image: 'images/movie1.png' },
-      { title: 'Movie 4', image: 'images/movie1.png' },
-      { title: 'Movie 5', image: 'images/movie1.png' },
-    ]
+  async _init() {
+    try {
+      const moviesData = await tmdbService.getNowPlayingMovies()
+      const data = moviesData.results.slice(0, 5).map((movie) => ({
+        title: movie.title,
+        image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+      }))
 
-    const cardItems = data.map((item) => ({
-      type: CardItem,
-      item,
-    }))
+      console.log(data)
 
-    const rows = [
-      {
-        type: HorizontalContainer,
-        w: 1241,
-        h: 464,
-        props: {
-          items: cardItems,
-          railTitle: ELEMENTS.MOVIES,
-          h: 359,
-          titleFontFace: 'Inter-Bold',
-          titleFontSize: 24,
+      const cardItems = data.map((item) => ({
+        type: CardItem,
+        item,
+      }))
+
+      const rows = [
+        {
+          type: HorizontalContainer,
+          w: 1241,
+          h: 464,
+          props: {
+            items: cardItems,
+            railTitle: ELEMENTS.MOVIES,
+            h: 359,
+            titleFontFace: 'Inter-Bold',
+            titleFontSize: 24,
+          },
         },
-      },
-      {
-        type: HorizontalContainer,
-        w: 1241,
-        h: 464,
-        props: {
-          items: cardItems,
-          railTitle: ELEMENTS.SERIES,
-          h: 359,
-          titleFontFace: 'Inter-Bold',
-          titleFontSize: 24,
+        {
+          type: HorizontalContainer,
+          w: 1241,
+          h: 464,
+          props: {
+            items: cardItems,
+            railTitle: ELEMENTS.SERIES,
+            h: 359,
+            titleFontFace: 'Inter-Bold',
+            titleFontSize: 24,
+          },
         },
-      },
-    ]
+      ]
 
-    this.tag(ELEMENTS.WRAPPER).patch({
-      props: {
-        items: rows,
-      },
-    })
+      this.tag(ELEMENTS.WRAPPER).patch({
+        props: {
+          items: rows,
+        },
+      })
+    } catch (error) {
+      console.error('Failed to fetch movies:', error)
+      // Optionally show error UI or use fallback data
+    }
   }
 
   set background(data) {
@@ -124,10 +130,6 @@ export default class Home extends Lightning.Component {
     if (this._focusedComponent === ELEMENTS.WRAPPER) {
       const wrapper = this.tag(ELEMENTS.WRAPPER)
       const currentRow = wrapper.Items.children[wrapper._focusedIndex]
-
-      // console.log('row:', currentRow, 'element:', this._focusedComponent)
-      // console.log('currentRow._focusedIndex:', currentRow?._focusedIndex)
-      // console.log('items.length:', currentRow?._props?.items?.length)
 
       if (currentRow && currentRow._focusedIndex === currentRow._props.items.length - 1) {
         this._focusedComponent = ELEMENTS.WIDGET
