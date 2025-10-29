@@ -1,0 +1,67 @@
+import { Lightning } from '@lightningjs/sdk'
+import { TEXT_COLORS } from '../../utils/Colors'
+
+export default class NavElement extends Lightning.Component {
+  static _template() {
+    return {
+      h: 49,
+      flexItem: { marginRight: 130 },
+      Label: {
+        text: {
+          fontSize: 32,
+          fontFace: 'Inter-Medium',
+          textColor: TEXT_COLORS.GRAY,
+        },
+      },
+    }
+  }
+
+  set item(data) {
+    this._item = data
+    this.patch({
+      Label: {
+        text: { text: data.label },
+      },
+    })
+
+    this.patch({
+      w: this.tag('Label').renderWidth + 20,
+    })
+  }
+
+  _focus() {
+    this.stage.update()
+    this.patch({
+      Label: {
+        text: {
+          textColor: TEXT_COLORS.WHITE,
+        },
+      },
+    })
+
+    this.patch({
+      Underline: {
+        y: 45,
+        w: this.tag('Label').renderWidth,
+        h: 4,
+        rect: true,
+        color: TEXT_COLORS.RED,
+      },
+    })
+  }
+
+  _unfocus() {
+    this.patch({
+      Label: {
+        text: {
+          textColor: TEXT_COLORS.GRAY,
+        },
+      },
+    })
+    if (this.tag('Underline')) {
+      this.patch({
+        Underline: undefined,
+      })
+    }
+  }
+}

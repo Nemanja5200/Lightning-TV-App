@@ -1,10 +1,11 @@
 import Lightning from '@lightningjs/sdk/src/Lightning'
-import HorizontalContainer from '../components/HorizontalContainer/HorizontalContainer'
-import Card from '../components/Card/Card'
+
 import { Utils } from '@lightningjs/sdk'
-import VerticalContainer from '../components/VerticalContainer/VerticalContainer'
+import { CardItem, HorizontalContainer, NavBar, VerticalContainer } from '../components'
+import { ELEMENTS } from '../utils/Elements'
 
 export default class Home extends Lightning.Component {
+  _focusedComponent = ELEMENTS.NAVBAR
   static _template() {
     return {
       x: 0,
@@ -13,6 +14,9 @@ export default class Home extends Lightning.Component {
         w: 1920,
         h: 1080,
         zIndex: -1,
+      },
+      NavBar: {
+        type: NavBar,
       },
       Wrapper: {
         type: VerticalContainer,
@@ -33,7 +37,7 @@ export default class Home extends Lightning.Component {
     ]
 
     const cardItems = data.map((item) => ({
-      type: Card,
+      type: CardItem,
       item,
     }))
 
@@ -44,7 +48,7 @@ export default class Home extends Lightning.Component {
         h: 464,
         props: {
           items: cardItems,
-          railTitle: 'Movies',
+          railTitle: ELEMENTS.MOVIES,
           h: 359,
         },
       },
@@ -54,13 +58,13 @@ export default class Home extends Lightning.Component {
         h: 464,
         props: {
           items: cardItems,
-          railTitle: 'Series',
+          railTitle: ELEMENTS.SERIES,
           h: 359,
         },
       },
     ]
 
-    this.tag('Wrapper').patch({
+    this.tag(ELEMENTS.WRAPPER).patch({
       props: {
         items: rows,
       },
@@ -68,13 +72,36 @@ export default class Home extends Lightning.Component {
   }
 
   set background(data) {
-    this.tag('Background').patch({
+    this.tag(ELEMENTS.BACKGROUND).patch({
       src: Utils.asset(data.image),
       zIndex: data.zIndex ?? -100,
     })
   }
 
   _getFocused() {
-    return this.tag('Wrapper')
+    if (this._focusedComponent === ELEMENTS.NAVBAR) {
+      return this.tag(ELEMENTS.NAVBAR)
+    } else if (this._focusedComponent === ELEMENTS.WRAPPER) {
+      return this.tag(ELEMENTS.WRAPPER)
+    }
+  }
+
+  _handleDown() {
+    if (this._focusedComponent === ELEMENTS.NAVBAR) {
+      this._focusedComponent = ELEMENTS.WRAPPER
+      return true
+    }
+    return false
+  }
+
+  _handleUp() {
+    if (this._focusedComponent === ELEMENTS.WRAPPER) {
+      const wrapper = this.tag(ELEMENTS.WRAPPER)
+      if (wrapper._focusedIndex === 0) {
+        this._focusedComponent = ELEMENTS.NAVBAR
+        return true
+      }
+    }
+    return false
   }
 }

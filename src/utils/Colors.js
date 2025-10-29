@@ -3,4 +3,5 @@ export const TEXT_COLORS = {
   WHITE: 0xffffffff,
   TRANSPARENT: 0x00000000,
   BLACK: 0xff000000,
+  RED: 0xffff0000,
 }
