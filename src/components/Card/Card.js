@@ -8,6 +8,10 @@ export default class CardItem extends Lightning.Component {
       rect: true,
       w: 241,
       h: 359,
+      text: {
+        fontSize: 24,
+        fontFace: 'Inter-Regular',
+      },
       color: TEXT_COLORS.TRANSPARENT,
       flexItem: {
         marginRight: 24,

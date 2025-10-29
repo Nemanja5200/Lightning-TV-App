@@ -8,8 +8,8 @@ export default class NavElement extends Lightning.Component {
       flexItem: { marginRight: 130 },
       Label: {
         text: {
-          fontSize: 32,
-          fontFace: 'Inter-Medium',
+          fontSize: 24,
+          fontFace: 'Inter-Bold',
           textColor: TEXT_COLORS.GRAY,
         },
       },
