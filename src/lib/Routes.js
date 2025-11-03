@@ -1,4 +1,5 @@
 import { Home } from '../pages'
+import { ELEMENTS } from '../utils/Elements'
 
 export default {
   root: 'home',
@@ -6,6 +7,7 @@ export default {
     {
       path: 'home',
       component: Home,
+      widgets: [ELEMENTS.NAVBAR],
     },
   ],
 }

@@ -51,9 +51,6 @@ export default class NavElement extends Lightning.Component {
         color: COLORS.RED,
       },
     })
-
-    this.fireAncestors('$navItemSelected', this._item.label) // Fires 'Movies'
-    return true
   }
 
   _unfocus() {

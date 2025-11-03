@@ -1,5 +1,7 @@
 import { Router, Utils } from '@lightningjs/sdk'
 import routes from './lib/Routes'
+import { NavBar } from './components'
+import { ELEMENTS } from './utils/Elements'
 
 export default class App extends Router.App {
   static getFonts() {
@@ -12,6 +14,17 @@ export default class App extends Router.App {
   static _template() {
     return {
       ...super._template(),
+      Pages: {
+        collision: true,
+        w: 1920,
+        h: 1080,
+      },
+      Widgets: {
+        NavBar: {
+          type: NavBar,
+          zIndex: 3,
+        },
+      },
     }
   }
 
@@ -19,8 +32,8 @@ export default class App extends Router.App {
     Router.startRouter(routes, this)
   }
 
-  _getFocused() {
-    return Router.getActivePage()
+  get _NavBar() {
+    return this.tag(ELEMENTS.NAVBAR)
   }
 
   $navItemSelected(label) {

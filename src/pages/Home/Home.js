@@ -55,7 +55,9 @@ export default class Home extends Lightning.Component {
     this.tag('Background').patch({
       src: Utils.asset('images/background.png'),
     })
+
     const rows = await fetchHomeData()
+
     this.tag(ELEMENTS.MOVIES).patch({
       props: {
         items: rows.cardMovieItems,
@@ -66,11 +68,10 @@ export default class Home extends Lightning.Component {
         items: rows.cardSeriesItems,
       },
     })
-    this._setState(ELEMENTS.MOVIES)
-  }
 
-  _active() {
     this._setState(ELEMENTS.MOVIES)
+
+    Router.focusWidget(ELEMENTS.NAVBAR)
   }
 
   set background(data) {
@@ -80,12 +81,22 @@ export default class Home extends Lightning.Component {
     })
   }
 
+  get _Movies() {
+    return this.tag('Movies')
+  }
+
+  get _Series() {
+    return this.tag('Series')
+  }
+
   static _states() {
     return [
       class Movies extends this {
         $enter() {
+          this._dataLoaded = true
           this._refocus()
         }
+
         _getFocused() {
           return this.tag(ELEMENTS.MOVIES)
         }
@@ -111,6 +122,10 @@ export default class Home extends Lightning.Component {
       },
 
       class Series extends this {
+        $enter() {
+          this._refocus()
+        }
+
         _getFocused() {
           return this.tag(ELEMENTS.SERIES)
         }
@@ -131,6 +146,10 @@ export default class Home extends Lightning.Component {
       },
 
       class Widget extends this {
+        $enter() {
+          this._refocus()
+        }
+
         _getFocused() {
           return this.tag(ELEMENTS.WIDGET)
         }

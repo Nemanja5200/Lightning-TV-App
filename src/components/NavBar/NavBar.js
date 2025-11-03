@@ -1,6 +1,6 @@
 import Lightning from '@lightningjs/sdk/src/Lightning'
 import HorizontalContainer from '../HorizontalContainer/HorizontalContainer'
-import { Utils } from '@lightningjs/sdk'
+import { Router, Utils } from '@lightningjs/sdk'
 import NavElement from './NavElement,js'
 
 export default class Navbar extends Lightning.Component {
@@ -52,10 +52,10 @@ export default class Navbar extends Lightning.Component {
   }
 
   _handleDown() {
-    return false
-  }
-
-  _handleUp() {
-    return false
+    console.log('NavBar: handleDown called')
+    console.log('Active page:', Router.getActivePage())
+    Router.focusPage()
+    console.log('Called Router.focusPage()')
+    return true
   }
 }
