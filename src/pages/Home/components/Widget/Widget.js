@@ -1,8 +1,8 @@
 import Lightning from '@lightningjs/sdk/src/Lightning'
-import { COLORS } from '../../../utils/Colors'
-import { VerticalContainer } from '../../../components'
 import { Utils } from '@lightningjs/sdk'
 import WidgetCard from './WidgetCard'
+import { COLORS } from '../../../../constance/Colors'
+import { VerticalContainer } from '../../../../components'
 export default class Widget extends Lightning.Component {
   static _template() {
     return {

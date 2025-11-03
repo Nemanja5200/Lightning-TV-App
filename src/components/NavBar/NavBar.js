@@ -52,10 +52,7 @@ export default class Navbar extends Lightning.Component {
   }
 
   _handleDown() {
-    console.log('NavBar: handleDown called')
-    console.log('Active page:', Router.getActivePage())
     Router.focusPage()
-    console.log('Called Router.focusPage()')
     return true
   }
 }

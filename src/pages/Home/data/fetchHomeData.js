@@ -1,7 +1,7 @@
-import { CardItem } from '../components'
-import { tmdbService } from './tmbdService'
+import { CardItem } from '../../../components'
+import { tmdbService } from '../../../service/tmbdService'
 
-export async function fetchHomeData() {
+export default async function fetchHomeData(page) {
   try {
     const [moviesData, seriesData] = await Promise.all([
       tmdbService.getNowPlayingMovies(),
@@ -20,12 +20,15 @@ export async function fetchHomeData() {
     const cardMovieItems = createCardItems(moviesData.results)
     const cardSeriesItems = createCardItems(seriesData.results, true)
 
-    return {
+    page.props = {
       cardMovieItems,
       cardSeriesItems,
     }
   } catch (error) {
     console.error('❌ Failed to fetch TMDB data:', error)
-    return [] // fail gracefully
+    page.props = {
+      cardMovieItems: [],
+      cardSeriesItems: [],
+    }
   }
 }

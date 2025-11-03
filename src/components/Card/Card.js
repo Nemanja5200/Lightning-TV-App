@@ -1,6 +1,6 @@
 import { Utils } from '@lightningjs/sdk'
 import Lightning from '@lightningjs/sdk/src/Lightning'
-import { COLORS } from '../../utils/Colors'
+import { COLORS } from '../../constance/Colors'
 
 export default class CardItem extends Lightning.Component {
   static _template() {

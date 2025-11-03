@@ -1,5 +1,5 @@
 import { Lightning } from '@lightningjs/sdk'
-import { COLORS } from '../../utils/Colors'
+import { COLORS } from '../../constance/Colors'
 
 export default class NavElement extends Lightning.Component {
   static _template() {

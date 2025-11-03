@@ -1,7 +1,7 @@
 // HorizontalContainer.js
 import Lightning from '@lightningjs/sdk/src/Lightning'
-import { clamp } from '../../utils/index'
 import { Colors } from '@lightningjs/sdk'
+import { clamp } from '../../utils/clamp'
 export default class HorizontalContainer extends Lightning.Component {
   _props = {
     items: [],

@@ -1,9 +1,8 @@
 import Lightning from '@lightningjs/sdk/src/Lightning'
 import { Router, Utils } from '@lightningjs/sdk'
-import { Widget } from '../components'
-import { fetchHomeData } from '../../service/fetchHomeData'
 import { HorizontalContainer } from '../../components'
-import { ELEMENTS } from '../../utils/Elements'
+import { ELEMENTS } from '../../constance/Elements'
+import { Widget } from './components'
 
 export default class Home extends Lightning.Component {
   static _template() {
@@ -51,27 +50,47 @@ export default class Home extends Lightning.Component {
     }
   }
 
-  async _init() {
+  set props(props) {
+    this._homeData = props
+
+    if (this.tag(ELEMENTS.MOVIES)) {
+      this.tag(ELEMENTS.MOVIES).patch({
+        props: {
+          items: props.cardMovieItems,
+        },
+      })
+      this.tag(ELEMENTS.SERIES).patch({
+        props: {
+          items: props.cardSeriesItems,
+        },
+      })
+    }
+  }
+
+  _init() {
     this.tag('Background').patch({
       src: Utils.asset('images/background.png'),
     })
 
-    const rows = await fetchHomeData()
-
-    this.tag(ELEMENTS.MOVIES).patch({
-      props: {
-        items: rows.cardMovieItems,
-      },
-    })
-    this.tag(ELEMENTS.SERIES).patch({
-      props: {
-        items: rows.cardSeriesItems,
-      },
-    })
+    if (this._homeData) {
+      this.tag(ELEMENTS.MOVIES).patch({
+        props: {
+          items: this._homeData.cardMovieItems,
+        },
+      })
+      this.tag(ELEMENTS.SERIES).patch({
+        props: {
+          items: this._homeData.cardSeriesItems,
+        },
+      })
+    }
 
     this._setState(ELEMENTS.MOVIES)
-
     Router.focusWidget(ELEMENTS.NAVBAR)
+  }
+
+  _active() {
+    this.fireAncestors('$hideLoading')
   }
 
   set background(data) {
@@ -82,11 +101,11 @@ export default class Home extends Lightning.Component {
   }
 
   get _Movies() {
-    return this.tag('Movies')
+    return this.tag(ELEMENTS.MOVIES)
   }
 
   get _Series() {
-    return this.tag('Series')
+    return this.tag(ELEMENTS.SERIES)
   }
 
   static _states() {
@@ -96,21 +115,17 @@ export default class Home extends Lightning.Component {
           this._dataLoaded = true
           this._refocus()
         }
-
         _getFocused() {
           return this.tag(ELEMENTS.MOVIES)
         }
-
         _handleDown() {
           this._setState(ELEMENTS.SERIES)
           return true
         }
-
         _handleUp() {
           Router.focusWidget(ELEMENTS.NAVBAR)
           return true
         }
-
         _handleRight() {
           const movies = this.tag(ELEMENTS.MOVIES)
           if (movies._focusedIndex === movies._props.items.length - 1) {
@@ -120,21 +135,17 @@ export default class Home extends Lightning.Component {
           return false
         }
       },
-
       class Series extends this {
         $enter() {
           this._refocus()
         }
-
         _getFocused() {
           return this.tag(ELEMENTS.SERIES)
         }
-
         _handleUp() {
           this._setState(ELEMENTS.MOVIES)
           return true
         }
-
         _handleRight() {
           const series = this.tag(ELEMENTS.SERIES)
           if (series._focusedIndex === series._props.items.length - 1) {
@@ -144,16 +155,13 @@ export default class Home extends Lightning.Component {
           return false
         }
       },
-
       class Widget extends this {
         $enter() {
           this._refocus()
         }
-
         _getFocused() {
           return this.tag(ELEMENTS.WIDGET)
         }
-
         _handleLeft() {
           this._setState(ELEMENTS.MOVIES)
           return true

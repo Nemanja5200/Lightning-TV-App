@@ -1,13 +1,16 @@
 import { Home } from '../pages'
-import { ELEMENTS } from '../utils/Elements'
+import { ELEMENTS } from '../constance/Elements'
+import { PATHS } from '../constance/paths'
+import fetchHomeData from '../pages/Home/data/fetchHomeData'
 
 export default {
-  root: 'home',
+  root: PATHS.HOME,
   routes: [
     {
-      path: 'home',
+      path: PATHS.HOME,
       component: Home,
       widgets: [ELEMENTS.NAVBAR],
+      before: fetchHomeData,
     },
   ],
 }

@@ -1,5 +1,5 @@
 import Lightning from '@lightningjs/sdk/src/Lightning'
-import { COLORS } from '../../../utils/Colors'
+import { COLORS } from '../../../../constance/Colors'
 
 export default class WidgetCard extends Lightning.Component {
   static _template() {
