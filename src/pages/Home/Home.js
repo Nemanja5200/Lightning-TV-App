@@ -1,13 +1,11 @@
 import Lightning from '@lightningjs/sdk/src/Lightning'
-import { Utils } from '@lightningjs/sdk'
+import { Router, Utils } from '@lightningjs/sdk'
 import { Widget } from '../components'
-import { ELEMENTS } from '../../utils/Elements'
 import { fetchHomeData } from '../../service/fetchHomeData'
-import { NavBar, VerticalContainer } from '../../components'
+import { HorizontalContainer } from '../../components'
+import { ELEMENTS } from '../../utils/Elements'
 
 export default class Home extends Lightning.Component {
-  _focusedComponent = ELEMENTS.NAVBAR
-
   static _template() {
     return {
       x: 0,
@@ -17,14 +15,33 @@ export default class Home extends Lightning.Component {
         h: 1080,
         zIndex: -1,
       },
-      NavBar: {
-        type: NavBar,
-      },
-      Wrapper: {
-        type: VerticalContainer,
+      Content: {
         x: 64,
         y: 125,
         w: 1241,
+        Movies: {
+          type: HorizontalContainer,
+          w: 1241,
+          h: 464,
+          props: {
+            railTitle: 'Movies',
+            h: 359,
+            titleFontFace: 'Inter-Bold',
+            titleFontSize: 24,
+          },
+        },
+        Series: {
+          type: HorizontalContainer,
+          w: 1241,
+          h: 464,
+          y: 430,
+          props: {
+            railTitle: 'Series',
+            h: 359,
+            titleFontFace: 'Inter-Bold',
+            titleFontSize: 24,
+          },
+        },
       },
       Widget: {
         type: Widget,
@@ -38,73 +55,91 @@ export default class Home extends Lightning.Component {
     this.tag('Background').patch({
       src: Utils.asset('images/background.png'),
     })
-
     const rows = await fetchHomeData()
-    this.tag(ELEMENTS.WRAPPER).patch({
+    this.tag(ELEMENTS.MOVIES).patch({
       props: {
-        items: rows,
+        items: rows.cardMovieItems,
       },
     })
+    this.tag(ELEMENTS.SERIES).patch({
+      props: {
+        items: rows.cardSeriesItems,
+      },
+    })
+    this._setState(ELEMENTS.MOVIES)
+  }
+
+  _active() {
+    this._setState(ELEMENTS.MOVIES)
   }
 
   set background(data) {
-    this.tag(ELEMENTS.BACKGROUND).patch({
+    this.tag('Background').patch({
       src: Utils.asset(data.image),
       zIndex: data.zIndex ?? -100,
     })
   }
 
-  _getFocused() {
-    if (this._focusedComponent === ELEMENTS.NAVBAR) {
-      return this.tag(ELEMENTS.NAVBAR)
-    } else if (this._focusedComponent === ELEMENTS.WRAPPER) {
-      return this.tag(ELEMENTS.WRAPPER)
-    } else if (this._focusedComponent === ELEMENTS.WIDGET) {
-      return this.tag(ELEMENTS.WIDGET)
-    }
-  }
+  static _states() {
+    return [
+      class Movies extends this {
+        $enter() {
+          this._refocus()
+        }
+        _getFocused() {
+          return this.tag(ELEMENTS.MOVIES)
+        }
 
-  _handleDown() {
-    if (this._focusedComponent === ELEMENTS.NAVBAR) {
-      this._focusedComponent = ELEMENTS.WRAPPER
-      return true
-    }
-    return false
-  }
+        _handleDown() {
+          this._setState(ELEMENTS.SERIES)
+          return true
+        }
 
-  _handleUp() {
-    if (this._focusedComponent === ELEMENTS.WRAPPER) {
-      const wrapper = this.tag(ELEMENTS.WRAPPER)
-      if (wrapper._focusedIndex === 0) {
-        this._focusedComponent = ELEMENTS.NAVBAR
-        return true
-      }
-    } else if (this._focusedComponent === ELEMENTS.WIDGET) {
-      this._focusedComponent = ELEMENTS.WRAPPER
-      return true
-    }
-    return false
-  }
+        _handleUp() {
+          Router.focusWidget(ELEMENTS.NAVBAR)
+          return true
+        }
 
-  _handleRight() {
-    if (this._focusedComponent === ELEMENTS.WRAPPER) {
-      const wrapper = this.tag(ELEMENTS.WRAPPER)
-      const currentRow = wrapper.Items.children[wrapper._focusedIndex]
+        _handleRight() {
+          const movies = this.tag(ELEMENTS.MOVIES)
+          if (movies._focusedIndex === movies._props.items.length - 1) {
+            this._setState(ELEMENTS.WIDGET)
+            return true
+          }
+          return false
+        }
+      },
 
-      if (currentRow && currentRow._focusedIndex === currentRow._props.items.length - 1) {
-        this._focusedComponent = ELEMENTS.WIDGET
-        return true
-      }
-      return false
-    }
-    return false
-  }
+      class Series extends this {
+        _getFocused() {
+          return this.tag(ELEMENTS.SERIES)
+        }
 
-  _handleLeft() {
-    if (this._focusedComponent === ELEMENTS.WIDGET) {
-      this._focusedComponent = ELEMENTS.WRAPPER
-      return true
-    }
-    return false
+        _handleUp() {
+          this._setState(ELEMENTS.MOVIES)
+          return true
+        }
+
+        _handleRight() {
+          const series = this.tag(ELEMENTS.SERIES)
+          if (series._focusedIndex === series._props.items.length - 1) {
+            this._setState(ELEMENTS.WIDGET)
+            return true
+          }
+          return false
+        }
+      },
+
+      class Widget extends this {
+        _getFocused() {
+          return this.tag(ELEMENTS.WIDGET)
+        }
+
+        _handleLeft() {
+          this._setState(ELEMENTS.MOVIES)
+          return true
+        }
+      },
+    ]
   }
 }

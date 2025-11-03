@@ -3,7 +3,7 @@ export const ELEMENTS = {
   MOVIES: 'Movies',
   HOME: 'Home',
   SERIES: 'Series',
-  WRAPPER: 'Wrapper',
+  CONTENT: 'Content',
   BACKGROUND: 'Background',
   WIDGETCARD: 'WidgetCard',
   WIDGET: 'Widget',
