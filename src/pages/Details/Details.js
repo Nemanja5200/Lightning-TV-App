@@ -141,7 +141,6 @@ export default class Details extends Lightning.Component {
 
   set props(props) {
     this._detailsData = props
-    console.log(props)
 
     const { parsedDetails, parsedCredits } = props
     if (!parsedDetails || !parsedCredits) return
