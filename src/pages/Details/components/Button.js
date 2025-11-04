@@ -8,7 +8,7 @@ export default class Button extends Lightning.Component {
       rect: true,
       shader: {
         type: Lightning.shaders.RoundedRectangle,
-        radius: 38,
+        radius: 30,
       },
       Wrapper: {
         flex: {
@@ -17,12 +17,10 @@ export default class Button extends Lightning.Component {
           justifyContent: 'center',
         },
         Icon: {
-          flexItem: { marginRight: 10 },
           w: 24,
           h: 24,
         },
         Label: {
-          flexItem: { marginLeft: 10 },
           text: {
             text: '',
             fontSize: 17,

@@ -2,7 +2,7 @@ import Lightning from '@lightningjs/sdk/src/Lightning'
 import { COLORS } from '../../constance/Colors'
 import Button from './components/Button'
 import { ELEMENTS } from '../../constance/Elements'
-import { Utils } from '@lightningjs/sdk'
+import { Router, Utils } from '@lightningjs/sdk'
 import { IMAGE_PATH } from '../../constance/Images'
 
 export default class Details extends Lightning.Component {
@@ -170,7 +170,39 @@ export default class Details extends Lightning.Component {
           w: 16,
           h: 16,
         },
+        Label: {
+          flexItem: { marginLeft: 13 },
+        },
       },
     })
+    this._setState(ELEMENTS.WHATCH_NOW)
+  }
+
+  static _states() {
+    return [
+      class WatchNow extends this {
+        _getFocused() {
+          return this.WatchNow
+        }
+
+        _handleUp() {
+          this._setState(ELEMENTS.BACK_BUTTON)
+          return true
+        }
+      },
+      class BackButton extends this {
+        _getFocused() {
+          return this.BackButton
+        }
+        _handleDown() {
+          this._setState(ELEMENTS.WHATCH_NOW)
+          return true
+        }
+        _handleEnter() {
+          Router.back()
+          return true
+        }
+      },
+    ]
   }
 }

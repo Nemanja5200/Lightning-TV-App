@@ -1,6 +1,6 @@
-import { Colors, Router, Utils } from '@lightningjs/sdk'
+import { Router, Utils } from '@lightningjs/sdk'
 import routes from './lib/Routes'
-import { LoadingScreenComponent, NavBar } from './components'
+import { NavBar } from './components'
 import { ELEMENTS } from './constance/Elements'
 import { NameToRoute } from './constance/paths'
 
