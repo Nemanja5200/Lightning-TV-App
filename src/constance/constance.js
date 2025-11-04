@@ -8,3 +8,8 @@ export const TMBD_ROUTE = {
   MOViE_CREDITS: 'movie/{id}/credits',
   SERIES_CREDITS: 'tv/{id}/credits',
 }
+
+export const DETAILS_TYPE = {
+  SEREIS: 'series',
+  MOVIE: 'movie',
+}

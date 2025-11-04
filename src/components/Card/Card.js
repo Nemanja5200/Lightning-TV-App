@@ -1,7 +1,7 @@
-import { Utils } from '@lightningjs/sdk'
+import { Router, Utils } from '@lightningjs/sdk'
 import Lightning from '@lightningjs/sdk/src/Lightning'
 import { COLORS } from '../../constance/Colors'
-import { ANCHORES } from '../../constance/Anchors'
+import { PATHS } from '../../constance/paths'
 import { ELEMENTS } from '../../constance/Elements'
 
 export default class CardItem extends Lightning.Component {
@@ -47,30 +47,31 @@ export default class CardItem extends Lightning.Component {
   }
 
   _focus() {
-    this.tag('Image').shader = {
+    this.tag(ELEMENTS.IMAGE).shader = {
       type: Lightning.shaders.RoundedRectangle,
       radius: 6,
       stroke: 6,
       strokeColor: 0xffff0000,
     }
-    this.tag('Label').patch({
+    this.tag(ELEMENTS.LABEL).patch({
       color: COLORS.WHITE,
     })
   }
 
   _unfocus() {
-    this.tag('Image').shader = {
+    this.tag(ELEMENTS.IMAGE).shader = {
       type: Lightning.shaders.RoundedRectangle,
       radius: 6,
       stroke: 0,
       strokeColor: 0x00000000,
     }
-    this.tag('Label').patch({
+    this.tag(ELEMENTS.LABEL).patch({
       color: COLORS.GRAY,
     })
   }
 
   _handleEnter() {
-    this.fireAncestors(ANCHORES.NAV_SELECT_ITEM, ELEMENTS.DETAILS)
+    Router.navigate(`${PATHS.DETAILS}/${this._item.mediaType}/${this._item.id}`)
+    return true
   }
 }

@@ -53,7 +53,7 @@ export default class Home extends Lightning.Component {
 
   set props(props) {
     this._homeData = props
-
+    console.log(props)
     if (this.tag(ELEMENTS.MOVIES)) {
       this.tag(ELEMENTS.MOVIES).patch({
         props: {

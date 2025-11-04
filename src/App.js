@@ -1,6 +1,6 @@
-import { Router, Utils } from '@lightningjs/sdk'
+import { Colors, Router, Utils } from '@lightningjs/sdk'
 import routes from './lib/Routes'
-import { NavBar } from './components'
+import { LoadingScreenComponent, NavBar } from './components'
 import { ELEMENTS } from './constance/Elements'
 import { NameToRoute } from './constance/paths'
 
@@ -20,19 +20,19 @@ export default class App extends Router.App {
         w: 1920,
         h: 1080,
       },
-      // Loading: {
-      //   type: LoadingScreenComponent,
-      //   rect: true,
-      //   w: 1920,
-      //   h: 1080,
-      //   zIndex: 102,
-      //   color: Colors('#000000').get(),
-      //   visible: true,
-      //   props: {
-      //     xPos: 960,
-      //     yPos: 540,
-      //   },
-      // },
+      Loading: {
+        type: LoadingScreenComponent,
+        rect: true,
+        w: 1920,
+        h: 1080,
+        zIndex: 102,
+        color: Colors('#000000').get(),
+        visible: true,
+        props: {
+          xPos: 960,
+          yPos: 540,
+        },
+      },
       Widgets: {
         NavBar: {
           type: NavBar,
@@ -59,8 +59,6 @@ export default class App extends Router.App {
   }
 
   $navItemSelected(label) {
-    console.log('Navigating to:', label)
-
     const route = NameToRoute[label]
     if (route) {
       Router.navigate(route)

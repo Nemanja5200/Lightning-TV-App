@@ -13,4 +13,6 @@ export const ELEMENTS = {
   BACK_BUTTON: 'BackButton',
   META_INFO: 'MetaInfo',
   WHATCH_NOW: 'WatchNow',
+  IMAGE: 'Image',
+  LABEL: 'Label',
 }

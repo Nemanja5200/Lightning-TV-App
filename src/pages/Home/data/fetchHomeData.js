@@ -12,8 +12,10 @@ export default async function fetchHomeData(page) {
       items.slice(0, 5).map((item) => ({
         type: CardItem,
         item: {
+          id: item.id,
           title: isSeries ? item.name : item.title,
           image: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+          mediaType: isSeries ? 'series' : 'movie',
         },
       }))
 

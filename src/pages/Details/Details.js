@@ -139,6 +139,42 @@ export default class Details extends Lightning.Component {
     return this.tag(ELEMENTS.WHATCH_NOW)
   }
 
+  set props(props) {
+    this._detailsData = props
+    console.log(props)
+
+    const { parsedDetails, parsedCredits } = props
+    if (!parsedDetails || !parsedCredits) return
+
+    this.tag('Title').patch({
+      text: { text: parsedDetails.title || 'N/A' },
+    })
+
+    this.tag('MetaInfo').patch({
+      text: {
+        text: `${parsedDetails.genre}\n${parsedDetails.duration}\n${parsedDetails.country} - ${parsedDetails.year} - IMDb: ${parsedDetails.rating}`,
+      },
+    })
+
+    this.tag('Paragraph').patch({
+      text: { text: parsedDetails.overview || 'No description available.' },
+    })
+
+    this.tag('DirectorContainer.Value').patch({
+      text: { text: parsedCredits.director || 'Unknown' },
+    })
+
+    this.tag('CastContainer.Value').patch({
+      text: { text: parsedCredits.cast || 'Unknown' },
+    })
+
+    if (parsedDetails.poster) {
+      this.tag('Poster').patch({
+        src: `https://image.tmdb.org/t/p/w500${parsedDetails.poster}`,
+      })
+    }
+  }
+
   _init() {
     this.BackButton.patch({
       w: 112,
