@@ -3,6 +3,7 @@ import { Router, Utils } from '@lightningjs/sdk'
 import { HorizontalContainer } from '../../components'
 import { ELEMENTS } from '../../constance/Elements'
 import { Widget } from './components'
+import { ANCHORES } from '../../constance/Anchors'
 
 export default class Home extends Lightning.Component {
   static _template() {
@@ -90,7 +91,7 @@ export default class Home extends Lightning.Component {
   }
 
   _active() {
-    this.fireAncestors('$hideLoading')
+    this.fireAncestors(ANCHORES.HIDE_LOADING)
   }
 
   set background(data) {

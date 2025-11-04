@@ -1,5 +1,6 @@
 import { Lightning } from '@lightningjs/sdk'
 import { COLORS } from '../../constance/Colors'
+import { ANCHORES } from '../../constance/Anchors'
 
 export default class NavElement extends Lightning.Component {
   static _template() {
@@ -66,5 +67,9 @@ export default class NavElement extends Lightning.Component {
         Underline: undefined,
       })
     }
+  }
+
+  _handleEnter() {
+    this.fireAncestors(ANCHORES.NAV_SELECT_ITEM, this._item.label)
   }
 }

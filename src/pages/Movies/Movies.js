@@ -8,10 +8,18 @@ export default class Movies extends Lightning.Component {
         w: 1920,
         h: 1080,
         rect: true,
-        color: COLORS.MOVIESBACKGROUND,
+        color: COLORS.BACKGROUND,
       },
       Content: {
-        // Your movie content here
+        Label: {
+          x: 900,
+          y: 500,
+          color: COLORS.GRAY,
+          text: {
+            text: 'Movies Page',
+            fontSize: 28,
+          },
+        },
       },
     }
   }

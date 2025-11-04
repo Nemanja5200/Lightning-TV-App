@@ -7,4 +7,10 @@ export const ELEMENTS = {
   BACKGROUND: 'Background',
   WIDGETCARD: 'WidgetCard',
   WIDGET: 'Widget',
+  DETAILS: 'Details',
+  WRAPPER: 'Wrapper',
+  ICON: 'Icon',
+  BACK_BUTTON: 'BackButton',
+  META_INFO: 'MetaInfo',
+  WHATCH_NOW: 'WatchNow',
 }
