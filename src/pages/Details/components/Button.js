@@ -22,12 +22,14 @@ export default class Button extends Lightning.Component {
           h: 24,
         },
         Label: {
+          flexItem: { marginLeft: 10 },
           text: {
             text: '',
-            fontSize: 20,
+            fontSize: 17,
             fontFace: 'Inter-Bold',
             textColor: COLORS.WHITE,
             letterSpacing: 2,
+            paddingLeft: 5,
           },
         },
       },
