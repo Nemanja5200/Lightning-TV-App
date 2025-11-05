@@ -25,48 +25,44 @@ export default class NavElement extends Lightning.Component {
       },
     })
 
-    this.patch({
-      w: this.tag('Label').renderWidth + 20,
+    this.tag('Label').once('txLoaded', () => {
+      this._labelWidth = this.tag('Label').renderWidth
+      this._labelReady = true
+
+      if (this._isFocused) {
+        this._applyFocus()
+      }
     })
   }
 
   _focus() {
-    this.stage.update()
-    const labelWidth = this.tag('Label').renderWidth
+    this._isFocused = true
+    if (this._labelReady) {
+      this._applyFocus()
+    }
+  }
+
+  _unfocus() {
+    this._isFocused = false
+    this.patch({
+      Label: { text: { textColor: COLORS.GRAY } },
+      Underline: undefined,
+    })
+  }
+
+  _applyFocus() {
     const extraPadding = 20
     this.patch({
-      Label: {
-        text: {
-          textColor: COLORS.WHITE,
-        },
-      },
-    })
-
-    this.patch({
+      Label: { text: { textColor: COLORS.WHITE } },
       Underline: {
         x: -extraPadding,
         y: 38,
-        w: labelWidth + extraPadding * 2,
+        w: this._labelWidth + extraPadding * 2,
         h: 4,
         rect: true,
         color: COLORS.RED,
       },
     })
-  }
-
-  _unfocus() {
-    this.patch({
-      Label: {
-        text: {
-          textColor: COLORS.GRAY,
-        },
-      },
-    })
-    if (this.tag('Underline')) {
-      this.patch({
-        Underline: undefined,
-      })
-    }
   }
 
   _handleEnter() {

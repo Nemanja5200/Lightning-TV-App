@@ -1,7 +1,7 @@
 import Lightning from '@lightningjs/sdk/src/Lightning'
 import HorizontalContainer from '../HorizontalContainer/HorizontalContainer'
 import { Router, Utils } from '@lightningjs/sdk'
-import NavElement from './NavElement,js'
+import NavElement from './NavElement.js'
 
 export default class Navbar extends Lightning.Component {
   static _template() {
