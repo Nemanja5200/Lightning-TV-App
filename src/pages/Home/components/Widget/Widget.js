@@ -8,7 +8,7 @@ export default class Widget extends Lightning.Component {
     return {
       rect: true,
       w: 312,
-      h: 826,
+      h: 850,
       color: COLORS.BLACK,
       shader: {
         type: Lightning.shaders.RoundedRectangle,

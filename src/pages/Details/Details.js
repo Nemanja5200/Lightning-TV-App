@@ -25,7 +25,7 @@ export default class Details extends Lightning.Component {
         MetaInfo: {
           y: 108,
           text: {
-            text: 'Drama\n98 Minutes\nUS - 1987 - PG - IMDb: 7.7',
+            text: '',
             fontFace: 'Inter-Regular',
             fontSize: 20,
             textColor: COLORS.WHITE,
@@ -41,7 +41,6 @@ export default class Details extends Lightning.Component {
             flexItem: { marginRight: 40 },
             w: 325,
             h: 485,
-            src: Utils.asset(IMAGE_PATH.DETAILS_POSTER),
           },
           Details: {
             w: 698,
@@ -51,7 +50,7 @@ export default class Details extends Lightning.Component {
             Title: {
               flexItem: { marginBottom: 20 },
               text: {
-                text: 'Empire Of The Sun',
+                text: '',
                 fontFace: 'Inter-Bold',
                 fontSize: 28,
                 textColor: COLORS.WHITE,
@@ -60,11 +59,11 @@ export default class Details extends Lightning.Component {
             Paragraph: {
               flexItem: { marginBottom: 20 },
               text: {
-                text: 'Boolean union variant background text vertical rectangle background horizontal. Boolean union variant background text vertical rectangle background horizontal. Pen export mask font image ellipse',
-                fontFace: 'Inter-Bold',
-                fontSize: 22,
+                text: '',
+                fontFace: 'Inter-Regular',
+                fontSize: 18,
                 textColor: COLORS.WHITE,
-                lineHeight: 31,
+                lineHeight: 26,
                 wordWrap: true,
                 wordWrapWidth: 698,
                 maxLines: 4,
@@ -87,7 +86,7 @@ export default class Details extends Lightning.Component {
                 },
                 Value: {
                   text: {
-                    text: 'Enzo G. Castellari',
+                    text: '',
                     fontFace: 'Inter-Regular',
                     fontSize: 18,
                     textColor: COLORS.WHITE,
@@ -107,7 +106,7 @@ export default class Details extends Lightning.Component {
                 },
                 Value: {
                   text: {
-                    text: 'Enzo G. Castellari, Enzo G. Castellari, Enzo G. Castellari',
+                    text: '',
                     fontFace: 'Inter-Regular',
                     fontSize: 18,
                     textColor: COLORS.WHITE,
@@ -117,7 +116,6 @@ export default class Details extends Lightning.Component {
                 },
               },
             },
-
             WatchNow: {
               type: Button,
             },
@@ -128,49 +126,27 @@ export default class Details extends Lightning.Component {
   }
 
   get BackButton() {
-    return this.tag(ELEMENTS.BACK_BUTTON)
+    return this.tag('Content.BackButton')
   }
 
   get MetaInfo() {
-    return this.tag(ELEMENTS.META_INFO)
+    return this.tag('Content.MetaInfo')
   }
 
   get WatchNow() {
-    return this.tag(ELEMENTS.WHATCH_NOW)
+    return this.tag('Content.MovieContent.Details.WatchNow')
   }
 
   set props(props) {
+    console.log('Received props:', props)
     this._detailsData = props
 
     const { parsedDetails, parsedCredits } = props
     if (!parsedDetails || !parsedCredits) return
 
-    this.tag('Title').patch({
-      text: { text: parsedDetails.title || 'N/A' },
-    })
-
-    this.tag('MetaInfo').patch({
-      text: {
-        text: `${parsedDetails.genre}\n${parsedDetails.duration}\n${parsedDetails.country} - ${parsedDetails.year} - IMDb: ${parsedDetails.rating}`,
-      },
-    })
-
-    this.tag('Paragraph').patch({
-      text: { text: parsedDetails.overview || 'No description available.' },
-    })
-
-    this.tag('DirectorContainer.Value').patch({
-      text: { text: parsedCredits.director || 'Unknown' },
-    })
-
-    this.tag('CastContainer.Value').patch({
-      text: { text: parsedCredits.cast || 'Unknown' },
-    })
-
-    if (parsedDetails.poster) {
-      this.tag('Poster').patch({
-        src: `https://image.tmdb.org/t/p/w500${parsedDetails.poster}`,
-      })
+    // Store data and update if template is ready
+    if (this.tag('Content.MetaInfo')) {
+      this._updateUI()
     }
   }
 
@@ -210,12 +186,60 @@ export default class Details extends Lightning.Component {
         },
       },
     })
+
+    if (this._detailsData) {
+      this._updateUI()
+    }
+
     this._setState(ELEMENTS.WHATCH_NOW)
+  }
+
+  _updateUI() {
+    const { parsedDetails, parsedCredits } = this._detailsData
+
+    this.tag('Content').patch({
+      MetaInfo: {
+        text: {
+          text: `${parsedDetails.genre}\n${parsedDetails.duration}\n${parsedDetails.country} - ${parsedDetails.year} - IMDb: ${parsedDetails.rating}`,
+        },
+      },
+      MovieContent: {
+        Poster: parsedDetails.poster
+          ? {
+              src: `https://image.tmdb.org/t/p/w500${parsedDetails.poster}`,
+            }
+          : {},
+        Details: {
+          Title: {
+            text: { text: parsedDetails.title || 'N/A' },
+          },
+          Paragraph: {
+            text: { text: parsedDetails.overview || 'No description available.' },
+          },
+          Castinfo: {
+            DirectorContainer: {
+              Value: {
+                text: { text: parsedCredits.director || 'Unknown' },
+              },
+            },
+            CastContainer: {
+              Value: {
+                text: { text: parsedCredits.cast || 'Unknown' },
+              },
+            },
+          },
+        },
+      },
+    })
   }
 
   static _states() {
     return [
       class WatchNow extends this {
+        $enter() {
+          this._refocus()
+        }
+
         _getFocused() {
           return this.WatchNow
         }
@@ -226,15 +250,21 @@ export default class Details extends Lightning.Component {
         }
       },
       class BackButton extends this {
+        $enter() {
+          this._refocus()
+        }
+
         _getFocused() {
           return this.BackButton
         }
+
         _handleDown() {
           this._setState(ELEMENTS.WHATCH_NOW)
           return true
         }
+
         _handleEnter() {
-          Router.back()
+          Router.navigate('home')
           return true
         }
       },

@@ -1,5 +1,6 @@
 import { Router, Utils } from '@lightningjs/sdk'
 import Lightning from '@lightningjs/sdk/src/Lightning'
+import { TextBox } from '@lightningjs/ui-components'
 import { COLORS } from '../../constance/Colors'
 import { PATHS } from '../../constance/paths'
 import { ELEMENTS } from '../../constance/Elements'
@@ -10,10 +11,6 @@ export default class CardItem extends Lightning.Component {
       rect: true,
       w: 241,
       h: 359,
-      text: {
-        fontSize: 24,
-        fontFace: 'Inter-Regular',
-      },
       color: COLORS.TRANSPARENT,
       flexItem: {
         marginRight: 24,
@@ -27,9 +24,18 @@ export default class CardItem extends Lightning.Component {
       },
       Label: {
         y: 0,
-        color: COLORS.GRAY,
-        text: {
-          fontSize: 28,
+        type: TextBox,
+        w: 241,
+        h: 49,
+        fixed: true,
+        marquee: true,
+        clipping: true,
+        style: {
+          textStyle: {
+            fontSize: 24,
+            textColor: COLORS.GRAY,
+            fontFace: 'Inter-Regular',
+          },
         },
       },
     }
@@ -37,12 +43,12 @@ export default class CardItem extends Lightning.Component {
 
   set item(data) {
     this._item = data
-
     const imageSrc = data.image.startsWith('http') ? data.image : Utils.asset(data.image)
-
     this.patch({
       Image: { src: imageSrc },
-      Label: { text: { text: data.title } },
+      Label: {
+        content: data.title,
+      },
     })
   }
 
@@ -54,7 +60,11 @@ export default class CardItem extends Lightning.Component {
       strokeColor: 0xffff0000,
     }
     this.tag(ELEMENTS.LABEL).patch({
-      color: COLORS.WHITE,
+      style: {
+        textStyle: {
+          textColor: COLORS.WHITE,
+        },
+      },
     })
   }
 
@@ -66,7 +76,11 @@ export default class CardItem extends Lightning.Component {
       strokeColor: 0x00000000,
     }
     this.tag(ELEMENTS.LABEL).patch({
-      color: COLORS.GRAY,
+      style: {
+        textStyle: {
+          textColor: COLORS.GRAY,
+        },
+      },
     })
   }
 

@@ -10,7 +10,11 @@ export default class Navbar extends Lightning.Component {
       h: 60,
       x: 32,
       y: 32,
-      flexItem: { marginRight: 10 },
+      flex: {
+        direction: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+      },
       Logo: {
         w: 301,
         h: 44,
@@ -18,10 +22,10 @@ export default class Navbar extends Lightning.Component {
       },
       NavItems: {
         type: HorizontalContainer,
-        x: 340,
+        x: 80,
         w: 674,
         h: 49,
-        flex: { paddingLeft: 150 },
+        flexItem: { marginTop: 10 },
       },
     }
   }

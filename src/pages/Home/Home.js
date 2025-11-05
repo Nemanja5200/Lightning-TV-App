@@ -127,12 +127,8 @@ export default class Home extends Lightning.Component {
           return true
         }
         _handleRight() {
-          const movies = this.tag(ELEMENTS.MOVIES)
-          if (movies._focusedIndex === movies._props.items.length - 1) {
-            this._setState(ELEMENTS.WIDGET)
-            return true
-          }
-          return false
+          this._setState(ELEMENTS.WIDGET)
+          return true
         }
       },
       class Series extends this {
@@ -147,18 +143,11 @@ export default class Home extends Lightning.Component {
           return true
         }
         _handleRight() {
-          const series = this.tag(ELEMENTS.SERIES)
-          if (series._focusedIndex === series._props.items.length - 1) {
-            this._setState(ELEMENTS.WIDGET)
-            return true
-          }
-          return false
+          this._setState(ELEMENTS.WIDGET)
+          return true
         }
       },
       class Widget extends this {
-        $enter() {
-          this._refocus()
-        }
         _getFocused() {
           return this.tag(ELEMENTS.WIDGET)
         }
