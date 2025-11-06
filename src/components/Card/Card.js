@@ -22,9 +22,9 @@ export default class CardItem extends Lightning.Component {
       },
       Label: {
         y: 0,
-        type: TextBox,
         w: 241,
         h: 49,
+        type: TextBox,
         fixed: true,
         marquee: true,
         clipping: true,
@@ -50,28 +50,6 @@ export default class CardItem extends Lightning.Component {
     })
   }
 
-  set dimensions(config) {
-    this.patch({
-      w: config.width,
-      h: config.height,
-      flex: {
-        direction: config.direction || 'column',
-      },
-      Image: {
-        w: config.imageWidth || config.width,
-        h: config.imageHeight || config.height - 49,
-      },
-      Label: {
-        w: config.labelWidth || config.width,
-        h: config.labelHeight || 49,
-        x: config.labelX || 0,
-        y: config.labelY || 0,
-        mountX: config.labelMountX || 0,
-        mountY: config.labelMountY || 0,
-      },
-    })
-  }
-
   _focus() {
     this.tag(ELEMENTS.IMAGE).shader = {
       type: Lightning.shaders.RoundedRectangle,
@@ -89,6 +67,7 @@ export default class CardItem extends Lightning.Component {
   }
 
   _unfocus() {
+    this.tag(ELEMENTS.IMAGE).shader = null
     this.tag(ELEMENTS.IMAGE).shader = {
       type: Lightning.shaders.RoundedRectangle,
       radius: 6,

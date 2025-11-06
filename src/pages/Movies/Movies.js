@@ -1,8 +1,9 @@
-import { Lightning, Utils } from '@lightningjs/sdk'
+import { Lightning, Router, Utils } from '@lightningjs/sdk'
 import { COLORS } from '../../constance/Colors'
 import { IMAGE_PATH } from '../../constance/Images'
-import { CardItem, HorizontalContainer } from '../../components'
-import { CARD_TYPE } from '../../components/Card/Cards/config'
+import { HorizontalContainer } from '../../components'
+import { ELEMENTS } from '../../constance/Elements'
+import { HorCard } from '../../components/Card'
 
 export default class Movies extends Lightning.Component {
   static _template() {
@@ -106,8 +107,7 @@ export default class Movies extends Lightning.Component {
     }))
 
     const cards = data.map((movie) => ({
-      type: CardItem,
-      dimensions: { ...CARD_TYPE.horizontalMovieCard },
+      type: HorCard,
       item: {
         title: movie.title,
         image: movie.image,
@@ -119,5 +119,21 @@ export default class Movies extends Lightning.Component {
         items: cards,
       },
     })
+
+    this._setState('MoviesContainer')
+  }
+
+  static _states() {
+    return [
+      class MoviesContainer extends this {
+        _getFocused() {
+          return this.MoviesContainer
+        }
+        _handleUp() {
+          Router.focusWidget(ELEMENTS.NAVBAR)
+          return true
+        }
+      },
+    ]
   }
 }
