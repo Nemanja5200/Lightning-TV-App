@@ -20,19 +20,19 @@ export default class App extends Router.App {
         w: 1920,
         h: 1080,
       },
-      // Loading: {
-      //   type: LoadingScreenComponent,
-      //   rect: true,
-      //   w: 1920,
-      //   h: 1080,
-      //   zIndex: 102,
-      //   color: Colors('#000000').get(),
-      //   visible: true,
-      //   props: {
-      //     xPos: 960,
-      //     yPos: 540,
-      //   },
-      // },
+      Loading: {
+        type: LoadingScreenComponent,
+        rect: true,
+        w: 1920,
+        h: 1080,
+        zIndex: 102,
+        color: Colors('#000000').get(),
+        visible: true,
+        props: {
+          xPos: 960,
+          yPos: 540,
+        },
+      },
       Widgets: {
         NavBar: {
           type: NavBar,

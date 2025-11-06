@@ -57,11 +57,13 @@ export default class Home extends Lightning.Component {
       this.tag(ELEMENTS.MOVIES).patch({
         props: {
           items: props.cardMovieItems,
+          disableScroll: true,
         },
       })
       this.tag(ELEMENTS.SERIES).patch({
         props: {
           items: props.cardSeriesItems,
+          disableScroll: true,
         },
       })
     }

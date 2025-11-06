@@ -59,4 +59,10 @@ export default class Navbar extends Lightning.Component {
     Router.focusPage()
     return true
   }
+  _handleRight() {
+    return true
+  }
+  _handleLeft() {
+    return true
+  }
 }

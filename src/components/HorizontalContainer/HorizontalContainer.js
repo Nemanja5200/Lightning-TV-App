@@ -197,12 +197,12 @@ export default class HorizontalContainer extends Lightning.Component {
   }
 
   _handleRight() {
-    //this.Items.children[this._focusedIndex]._unfocus();
+    // this.Items.children[this._focusedIndex]._unfocus();
     const { items } = this._props
     if (this._focusedIndex < items.length - 1) {
       this.Items.children[this._focusedIndex]._unfocus()
       this._focusedIndex += 1
-      // this._reCalibrateScroll();
+      this._reCalibrateScroll()
       this.fireAncestors(
         '$horizontalContainerIndexChange',
         this._focusedIndex,
@@ -219,7 +219,7 @@ export default class HorizontalContainer extends Lightning.Component {
     if (this._focusedIndex > 0) {
       this.Items.children[this._focusedIndex]?._unfocus()
       this._focusedIndex -= 1
-      // this._reCalibrateScroll();
+      this._reCalibrateScroll()
       this.fireAncestors(
         '$horizontalContainerIndexChange',
         this._focusedIndex,

@@ -84,8 +84,6 @@ export default class Movies extends Lightning.Component {
             },
           },
           MoviesContainer: {
-            w: 2111,
-            h: 302,
             y: 697,
             x: 45,
             zIndex: 5,
@@ -117,6 +115,9 @@ export default class Movies extends Lightning.Component {
     this.MoviesContainer.patch({
       props: {
         items: cards,
+        disableScroll: false,
+        w: 1700,
+        h: 302,
       },
     })
 
