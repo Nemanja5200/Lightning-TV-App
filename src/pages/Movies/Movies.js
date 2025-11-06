@@ -1,6 +1,8 @@
 import { Lightning, Utils } from '@lightningjs/sdk'
 import { COLORS } from '../../constance/Colors'
 import { IMAGE_PATH } from '../../constance/Images'
+import { CardItem, HorizontalContainer } from '../../components'
+import { CARD_TYPE } from '../../components/Card/Cards/config'
 
 export default class Movies extends Lightning.Component {
   static _template() {
@@ -52,8 +54,70 @@ export default class Movies extends Lightning.Component {
             colorLeft: 0xcc151515,
             colorRight: 0x00151515,
           },
+          MovieInfo: {
+            w: 698,
+            h: 162,
+            y: 258,
+            x: 69,
+            zIndex: 5,
+            flex: { direction: 'column' },
+            Title: {
+              flexItem: { marginBottom: 40 },
+              text: {
+                text: 'Empire of the Sun',
+                fontFace: 'Inter-Bold',
+                fontSize: 28,
+                textColor: COLORS.WHITE,
+              },
+            },
+            Info: {
+              text: {
+                text: 'Boolean union variant background text vertical rectangle background horizontal. Boolean union variant background text vertical rectangle background horizontal. Pen export mask font image ellipse ',
+                fontFace: 'Inter-Regular',
+                fontSize: 22,
+                textColor: COLORS.WHITE,
+                wordWrap: true,
+                wordWrapWidth: 698,
+                lineHeight: 31,
+              },
+            },
+          },
+          MoviesContainer: {
+            w: 2111,
+            h: 302,
+            y: 697,
+            x: 45,
+            zIndex: 5,
+            type: HorizontalContainer,
+          },
         },
       },
     }
+  }
+
+  get MoviesContainer() {
+    return this.tag('MoviesContainer')
+  }
+
+  _init() {
+    const data = Array.from({ length: 10 }, (_, i) => ({
+      title: `Movie ${i + 1}`,
+      image: Utils.asset(IMAGE_PATH.TEST_VCARD),
+    }))
+
+    const cards = data.map((movie) => ({
+      type: CardItem,
+      dimensions: { ...CARD_TYPE.horizontalMovieCard },
+      item: {
+        title: movie.title,
+        image: movie.image,
+      },
+    }))
+
+    this.MoviesContainer.patch({
+      props: {
+        items: cards,
+      },
+    })
   }
 }

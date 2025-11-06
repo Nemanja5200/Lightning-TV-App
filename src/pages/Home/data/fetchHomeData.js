@@ -1,4 +1,5 @@
 import { CardItem } from '../../../components'
+import { CARD_TYPE } from '../../../components/Card/Cards/config'
 import { tmdbService } from '../../../service/tmbdService'
 
 export default async function fetchHomeData(page) {
@@ -11,6 +12,7 @@ export default async function fetchHomeData(page) {
     const createCardItems = (items, isSeries = false) =>
       items.slice(0, 5).map((item) => ({
         type: CardItem,
+        dimensions: { ...CARD_TYPE.verticalMovieCard },
         item: {
           id: item.id,
           title: isSeries ? item.name : item.title,
