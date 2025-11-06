@@ -108,6 +108,13 @@ export default class Home extends Lightning.Component {
     return this.tag(ELEMENTS.SERIES)
   }
 
+  _handleBack(e) {
+    if (Router.isNavigating()) {
+      return
+    }
+    e.preventDefault()
+  }
+
   static _states() {
     return [
       class Movies extends this {

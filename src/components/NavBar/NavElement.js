@@ -28,7 +28,6 @@ export default class NavElement extends Lightning.Component {
     this.tag('Label').once('txLoaded', () => {
       this._labelWidth = this.tag('Label').renderWidth
       this._labelReady = true
-
       if (this._isFocused) {
         this._applyFocus()
       }
