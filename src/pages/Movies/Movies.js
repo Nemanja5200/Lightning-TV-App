@@ -1,12 +1,12 @@
-import { Lightning, Router, Utils } from '@lightningjs/sdk'
+import { Lightning, Router } from '@lightningjs/sdk'
 import { COLORS } from '../../constance/Colors'
-import { IMAGE_PATH } from '../../constance/Images'
-import { HorizontalContainer } from '../../components'
+import { HorizontalContainer, SlideShow } from '../../components'
 import { ELEMENTS } from '../../constance/Elements'
 import { TMBD_ROUTE } from '../../constance/constance'
 
 export default class Movies extends Lightning.Component {
   _updateTimeout = null
+
   static _template() {
     return {
       Background: {
@@ -21,15 +21,10 @@ export default class Movies extends Lightning.Component {
           w: 1920,
           h: 697,
           zIndex: 2,
-          texture: {
-            type: Lightning.textures.ImageTexture,
-            src: Utils.asset(IMAGE_PATH.HERO_SECTION),
-            resizeMode: {
-              type: 'cover',
-              w: 1920,
-              h: 697,
-              clipY: 0.5,
-            },
+          HeroSlideshow: {
+            type: SlideShow,
+            w: 1920,
+            h: 697,
           },
           Gradient: {
             w: 1920 / 4,
@@ -100,26 +95,22 @@ export default class Movies extends Lightning.Component {
     return this.tag('MoviesContainer')
   }
 
-  get _focusedMovieIndex() {
-    return this._MoviesContainer_?._focusedIndex ?? 0
+  get HeroSlideshow() {
+    return this.tag('HeroSlideshow')
   }
 
   set props(props) {
     this._props = props
     const movie = props.movieInfo[0]
+
+    const heroImages = movie.image.map((img) => `${TMBD_ROUTE.IMAGE_W1280}${img}`)
+
     this.patch({
       Content: {
         Hero: {
-          texture: {
-            // Change this
-            type: Lightning.textures.ImageTexture,
-            src: `${TMBD_ROUTE.IMAGE_W1280}${movie.image[0]}`,
-            resizeMode: {
-              type: 'cover',
-              w: 1920,
-              h: 697,
-              clipY: 0.5,
-            },
+          HeroSlideshow: {
+            images: heroImages,
+            transitionDuration: 5000,
           },
           MoviesContainer: {
             props: {
@@ -154,27 +145,20 @@ export default class Movies extends Lightning.Component {
       const movie = this._props.movieInfo?.[newIndex]
       if (!movie) return
 
-      const hero = this.tag('Hero')
+      const heroImages = movie.image.map((img) => `${TMBD_ROUTE.IMAGE_W1280}${img}`)
+
       const movieInfo = this.tag('MovieInfo')
 
-      hero.setSmooth('alpha', 0.5, { duration: 0.2 })
-      movieInfo.setSmooth('x', -100, { duration: 0.25 })
       movieInfo.setSmooth('alpha', 0, { duration: 0.2 })
 
+      this.HeroSlideshow.setImagesOnFocues(heroImages)
+
       setTimeout(() => {
+        this.HeroSlideshow.images = heroImages
+
         this.patch({
           Content: {
             Hero: {
-              texture: {
-                type: Lightning.textures.ImageTexture,
-                src: `${TMBD_ROUTE.IMAGE_W1280}${movie.image[0]}`,
-                resizeMode: {
-                  type: 'cover',
-                  w: 1920,
-                  h: 697,
-                  clipY: 0.5,
-                },
-              },
               MovieInfo: {
                 Title: { text: { text: movie.title } },
                 Info: { text: { text: movie.overview } },
@@ -183,13 +167,29 @@ export default class Movies extends Lightning.Component {
           },
         })
 
-        hero.setSmooth('alpha', 1, { duration: 0.3 })
-        movieInfo.setSmooth('x', 69, { duration: 0.3 })
         movieInfo.setSmooth('alpha', 1, { duration: 0.3 })
-      }, 150)
+      }, 200)
     }, 150)
 
     this._preloadAdjacentImages(newIndex)
+  }
+
+  _preloadAdjacentImages(currentIndex) {
+    const { movieInfo } = this._props
+
+    if (movieInfo[currentIndex + 1]) {
+      movieInfo[currentIndex + 1].image.forEach((img) => {
+        const src = `${TMBD_ROUTE.IMAGE_W1280}${img}`
+        this.stage.textureManager.load(src)
+      })
+    }
+
+    if (movieInfo[currentIndex - 1]) {
+      movieInfo[currentIndex - 1].image.forEach((img) => {
+        const src = `${TMBD_ROUTE.IMAGE_W1280}${img}`
+        this.stage.textureManager.load(src)
+      })
+    }
   }
 
   _init() {
@@ -205,6 +205,12 @@ export default class Movies extends Lightning.Component {
         _handleUp() {
           Router.focusWidget(ELEMENTS.NAVBAR)
           return true
+        }
+        $enter() {
+          this.HeroSlideshow?.resume()
+        }
+        $exit() {
+          this.HeroSlideshow?.pause()
         }
       },
     ]

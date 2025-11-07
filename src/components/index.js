@@ -3,3 +3,4 @@ export { default as HorizontalContainer } from './HorizontalContainer/Horizontal
 export { default as VerticalContainer } from './VerticalContainer/VerticalContainer'
 export { default as NavBar } from './NavBar/NavBar'
 export { default as LoadingScreenComponent } from './LoadingScreenComponent/LoadinScreenComponent'
+export { default as SlideShow } from './SlideShow/SlideShow'
