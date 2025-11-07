@@ -3,9 +3,10 @@ import { COLORS } from '../../constance/Colors'
 import { IMAGE_PATH } from '../../constance/Images'
 import { HorizontalContainer } from '../../components'
 import { ELEMENTS } from '../../constance/Elements'
-import { HorCard } from '../../components/Card'
+import { TMBD_ROUTE } from '../../constance/constance'
 
 export default class Movies extends Lightning.Component {
+  _updateTimeout = null
   static _template() {
     return {
       Background: {
@@ -65,7 +66,6 @@ export default class Movies extends Lightning.Component {
             Title: {
               flexItem: { marginBottom: 40 },
               text: {
-                text: 'Empire of the Sun',
                 fontFace: 'Inter-Bold',
                 fontSize: 28,
                 textColor: COLORS.WHITE,
@@ -73,7 +73,6 @@ export default class Movies extends Lightning.Component {
             },
             Info: {
               text: {
-                text: 'Boolean union variant background text vertical rectangle background horizontal. Boolean union variant background text vertical rectangle background horizontal. Pen export mask font image ellipse ',
                 fontFace: 'Inter-Regular',
                 fontSize: 22,
                 textColor: COLORS.WHITE,
@@ -88,6 +87,9 @@ export default class Movies extends Lightning.Component {
             x: 45,
             zIndex: 5,
             type: HorizontalContainer,
+            signals: {
+              horizontalContainerIndexChange: '_horizontalContainerIndexChange',
+            },
           },
         },
       },
@@ -98,29 +100,99 @@ export default class Movies extends Lightning.Component {
     return this.tag('MoviesContainer')
   }
 
-  _init() {
-    const data = Array.from({ length: 10 }, (_, i) => ({
-      title: `Movie ${i + 1}`,
-      image: Utils.asset(IMAGE_PATH.TEST_VCARD),
-    }))
+  get _focusedMovieIndex() {
+    return this._MoviesContainer_?._focusedIndex ?? 0
+  }
 
-    const cards = data.map((movie) => ({
-      type: HorCard,
-      item: {
-        title: movie.title,
-        image: movie.image,
+  set props(props) {
+    this._props = props
+    const movie = props.movieInfo[0]
+    this.patch({
+      Content: {
+        Hero: {
+          texture: {
+            // Change this
+            type: Lightning.textures.ImageTexture,
+            src: `${TMBD_ROUTE.IMAGE_W1280}${movie.image[0]}`,
+            resizeMode: {
+              type: 'cover',
+              w: 1920,
+              h: 697,
+              clipY: 0.5,
+            },
+          },
+          MoviesContainer: {
+            props: {
+              items: props.cardMovieItems,
+              disableScroll: false,
+              w: 1700,
+              h: 302,
+            },
+          },
+          MovieInfo: {
+            Title: {
+              text: { text: movie.title },
+            },
+            Info: {
+              text: { text: movie.overview },
+            },
+          },
+        },
       },
-    }))
-
-    this.MoviesContainer.patch({
-      props: {
-        items: cards,
-        disableScroll: false,
-        w: 1700,
-        h: 302,
+      Background: {
+        color: props.bgColor || 0xff000000,
       },
     })
+  }
 
+  _horizontalContainerIndexChange(newIndex) {
+    if (this._updateTimeout) {
+      clearTimeout(this._updateTimeout)
+    }
+
+    this._updateTimeout = setTimeout(() => {
+      const movie = this._props.movieInfo?.[newIndex]
+      if (!movie) return
+
+      const hero = this.tag('Hero')
+      const movieInfo = this.tag('MovieInfo')
+
+      hero.setSmooth('alpha', 0.5, { duration: 0.2 })
+      movieInfo.setSmooth('x', -100, { duration: 0.25 })
+      movieInfo.setSmooth('alpha', 0, { duration: 0.2 })
+
+      setTimeout(() => {
+        this.patch({
+          Content: {
+            Hero: {
+              texture: {
+                type: Lightning.textures.ImageTexture,
+                src: `${TMBD_ROUTE.IMAGE_W1280}${movie.image[0]}`,
+                resizeMode: {
+                  type: 'cover',
+                  w: 1920,
+                  h: 697,
+                  clipY: 0.5,
+                },
+              },
+              MovieInfo: {
+                Title: { text: { text: movie.title } },
+                Info: { text: { text: movie.overview } },
+              },
+            },
+          },
+        })
+
+        hero.setSmooth('alpha', 1, { duration: 0.3 })
+        movieInfo.setSmooth('x', 69, { duration: 0.3 })
+        movieInfo.setSmooth('alpha', 1, { duration: 0.3 })
+      }, 150)
+    }, 150)
+
+    this._preloadAdjacentImages(newIndex)
+  }
+
+  _init() {
     this._setState('MoviesContainer')
   }
 

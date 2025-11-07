@@ -4,6 +4,7 @@ import Button from './components/Button'
 import { ELEMENTS } from '../../constance/Elements'
 import { Router, Utils } from '@lightningjs/sdk'
 import { IMAGE_PATH } from '../../constance/Images'
+import { TMBD_ROUTE } from '../../constance/constance'
 
 export default class Details extends Lightning.Component {
   static _template() {
@@ -206,7 +207,7 @@ export default class Details extends Lightning.Component {
       MovieContent: {
         Poster: parsedDetails.poster
           ? {
-              src: `https://image.tmdb.org/t/p/w500${parsedDetails.poster}`,
+              src: `${TMBD_ROUTE.IMAGE_500}${parsedDetails.poster}`,
             }
           : {},
         Details: {
@@ -264,7 +265,7 @@ export default class Details extends Lightning.Component {
         }
 
         _handleEnter() {
-          Router.navigate('home')
+          Router.back()
           return true
         }
       },

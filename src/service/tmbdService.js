@@ -22,6 +22,19 @@ export const tmdbService = {
     return response.data
   },
 
+  async getUpcomingMovies(page = 1) {
+    const responce = await api.get(TMBD_ROUTE.UPCOMING_MOVIES, {
+      params: { page },
+    })
+
+    return responce.data
+  },
+
+  async getMovieImages(id) {
+    const responce = await api.get(TMBD_ROUTE.IMAGES.replace('{movie_id}', id))
+    return responce
+  },
+
   async getDetails(id, type) {
     if (type === DETAILS_TYPE.MOVIE) {
       const responce = await api.get(TMBD_ROUTE.MDETAILS + id)

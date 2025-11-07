@@ -3,6 +3,7 @@ import { ELEMENTS } from '../constance/Elements'
 import { PATHS } from '../constance/paths'
 import fetchHomeData from '../pages/Home/data/fetchHomeData'
 import fetchDetailsData from '../pages/Details/data/fetchDetailsData'
+import fetchMoviesData from '../pages/Movies/data/fetchMoviesData'
 
 export default {
   root: PATHS.HOME,
@@ -17,6 +18,7 @@ export default {
       path: PATHS.MOVIES,
       component: Movies,
       widgets: [ELEMENTS.NAVBAR],
+      on: fetchMoviesData,
     },
 
     {

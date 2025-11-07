@@ -1,4 +1,5 @@
 import { VerCard } from '../../../components/Card'
+import { TMBD_ROUTE } from '../../../constance/constance'
 import { tmdbService } from '../../../service/tmbdService'
 
 export default async function fetchHomeData(page) {
@@ -14,7 +15,7 @@ export default async function fetchHomeData(page) {
         item: {
           id: item.id,
           title: isSeries ? item.name : item.title,
-          image: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+          image: `${TMBD_ROUTE.IMAGE_500}${item.poster_path}`,
           mediaType: isSeries ? 'series' : 'movie',
         },
       }))
