@@ -1,8 +1,10 @@
-import { Lightning } from '@lightningjs/sdk'
+import { Lightning, Router } from '@lightningjs/sdk'
 import { COLORS } from '../../constance/Colors'
 import { ANCHORES } from '../../constance/Anchors'
+import { NameToRoute } from '../../constance/paths'
 
 export default class NavElement extends Lightning.Component {
+  _isActive = false
   static _template() {
     return {
       h: 49,
@@ -15,6 +17,10 @@ export default class NavElement extends Lightning.Component {
         },
       },
     }
+  }
+
+  get route() {
+    return this._item?.route || this._item?.label?.toLowerCase()
   }
 
   set item(data) {
@@ -31,6 +37,29 @@ export default class NavElement extends Lightning.Component {
       if (this._isFocused) {
         this._applyFocus()
       }
+
+      if (this._isActive) {
+        this._updateColor()
+      }
+    })
+  }
+
+  get isActive() {
+    return this._isActive
+  }
+
+  set isActive(isActive) {
+    this._isActive = isActive
+    this._updateColor()
+  }
+
+  _updateColor() {
+    this.patch({
+      Label: {
+        text: {
+          textColor: this._isFocused || this._isActive ? COLORS.WHITE : COLORS.GRAY,
+        },
+      },
     })
   }
 
@@ -43,8 +72,12 @@ export default class NavElement extends Lightning.Component {
 
   _unfocus() {
     this._isFocused = false
+    if (!this._isActive) {
+      this.patch({
+        Label: { text: { textColor: COLORS.GRAY } },
+      })
+    }
     this.patch({
-      Label: { text: { textColor: COLORS.GRAY } },
       Underline: undefined,
     })
   }
@@ -62,9 +95,12 @@ export default class NavElement extends Lightning.Component {
         color: COLORS.RED,
       },
     })
+
+    this._updateColor()
   }
 
   _handleEnter() {
+    this.fireAncestors('$navItemActivated', this.route)
     this.fireAncestors(ANCHORES.NAV_SELECT_ITEM, this._item.label)
   }
 }

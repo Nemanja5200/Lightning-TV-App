@@ -33,7 +33,9 @@ export default class Navbar extends Lightning.Component {
   get NavItems() {
     return this.tag('NavItems')
   }
-
+  _active() {
+    this._updateActiveNav()
+  }
   _init() {
     const navData = [{ label: 'Home' }, { label: 'Movies' }]
 
@@ -64,5 +66,28 @@ export default class Navbar extends Lightning.Component {
   }
   _handleLeft() {
     return true
+  }
+
+  _updateActiveNav() {
+    setTimeout(() => {
+      const activeRoute = Router.getActiveHash()
+      const navItems = this.tag('NavItems').tag('Items')?.children || []
+      this._updateActiveFlags(navItems, activeRoute)
+    }, 50)
+  }
+
+  $navItemActivated(route) {
+    const navItems = this.tag('NavItems').tag('Items')?.children || []
+    this._updateActiveFlags(navItems, route)
+  }
+
+  _updateActiveFlags(navItems, route) {
+    navItems.forEach((item) => {
+      if (item.route === route) {
+        item.isActive = true
+      } else {
+        item.isActive = false
+      }
+    })
   }
 }

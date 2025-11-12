@@ -3,6 +3,7 @@ import routes from './lib/Routes'
 import { LoadingScreenComponent, NavBar } from './components'
 import { ELEMENTS } from './constance/Elements'
 import { NameToRoute } from './constance/paths'
+import '@lightningjs/core/inspector'
 
 export default class App extends Router.App {
   static getFonts() {
