@@ -170,26 +170,6 @@ export default class Movies extends Lightning.Component {
         movieInfo.setSmooth('alpha', 1, { duration: 0.3 })
       }, 200)
     }, 150)
-
-    this._preloadAdjacentImages(newIndex)
-  }
-
-  _preloadAdjacentImages(currentIndex) {
-    const { movieInfo } = this._props
-
-    if (movieInfo[currentIndex + 1]) {
-      movieInfo[currentIndex + 1].image.forEach((img) => {
-        const src = `${TMBD_ROUTE.IMAGE_W1280}${img}`
-        this.stage.textureManager.load(src)
-      })
-    }
-
-    if (movieInfo[currentIndex - 1]) {
-      movieInfo[currentIndex - 1].image.forEach((img) => {
-        const src = `${TMBD_ROUTE.IMAGE_W1280}${img}`
-        this.stage.textureManager.load(src)
-      })
-    }
   }
 
   _init() {

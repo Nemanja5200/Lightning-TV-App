@@ -68,7 +68,7 @@ export default class Navbar extends Lightning.Component {
     return true
   }
 
-  _onActivated(page) {
+  _onActivated() {
     this._updateActiveNav()
   }
 
