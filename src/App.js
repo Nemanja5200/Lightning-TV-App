@@ -65,4 +65,19 @@ export default class App extends Router.App {
       Router.navigate(route)
     }
   }
+
+  _handleBack() {
+    // Let Router handle the back navigation
+    const handled = Router.back()
+
+    if (handled) {
+      // Update navbar after navigation
+      setTimeout(() => {
+        this._NavBar?._updateActiveNav()
+      }, 100)
+      return true
+    }
+
+    return false
+  }
 }

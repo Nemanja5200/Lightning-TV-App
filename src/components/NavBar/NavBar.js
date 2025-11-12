@@ -68,6 +68,10 @@ export default class Navbar extends Lightning.Component {
     return true
   }
 
+  _onActivated(page) {
+    this._updateActiveNav()
+  }
+
   _updateActiveNav() {
     setTimeout(() => {
       const activeRoute = Router.getActiveHash()
