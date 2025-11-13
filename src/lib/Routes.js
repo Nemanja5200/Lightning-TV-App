@@ -1,4 +1,4 @@
-import { Details, Home, Movies } from '../pages'
+import { Details, Home, Movies, Player } from '../pages'
 import { ELEMENTS } from '../constance/Elements'
 import { PATHS } from '../constance/paths'
 import fetchHomeData from '../pages/Home/data/fetchHomeData'
@@ -25,6 +25,11 @@ export default {
       path: `${PATHS.DETAILS}/:type/:id`,
       component: Details,
       on: fetchDetailsData,
+    },
+
+    {
+      path: `${PATHS.PLAYER}`,
+      component: Player,
     },
   ],
 }

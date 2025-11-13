@@ -25,8 +25,6 @@ export default class CardItem extends Lightning.Component {
         w: 241,
         h: 49,
         type: Marquee,
-        autoStart: false,
-        repeat: -1,
         delay: 1,
         duration: 5,
         clipping: true,

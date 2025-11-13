@@ -249,6 +249,10 @@ export default class Details extends Lightning.Component {
           this._setState(ELEMENTS.BACK_BUTTON)
           return true
         }
+
+        _handleEnter() {
+          Router.navigate(PATHS.PLAYER)
+        }
       },
       class BackButton extends this {
         $enter() {

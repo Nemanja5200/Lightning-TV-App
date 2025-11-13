@@ -4,3 +4,4 @@ export { default as VerticalContainer } from './VerticalContainer/VerticalContai
 export { default as NavBar } from './NavBar/NavBar'
 export { default as LoadingScreenComponent } from './LoadingScreenComponent/LoadinScreenComponent'
 export { default as SlideShow } from './SlideShow/SlideShow'
+export { default as MoviePlayer } from './MoviePlayer/MoviePlayer'
