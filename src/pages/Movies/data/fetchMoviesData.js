@@ -5,7 +5,6 @@ import { tmdbService } from '../../../service/tmbdService'
 export default async function fetchMoviesData(page) {
   try {
     const upcomingMovies = await tmdbService.getUpcomingMovies()
-    console.log(upcomingMovies)
 
     const createCardItems = (items, isSeries = false) =>
       items.map((item) => ({

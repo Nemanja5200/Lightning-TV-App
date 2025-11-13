@@ -140,7 +140,6 @@ export default class Details extends Lightning.Component {
   }
 
   set props(props) {
-    console.log('Received props:', props)
     this._detailsData = props
 
     const { parsedDetails, parsedCredits } = props
