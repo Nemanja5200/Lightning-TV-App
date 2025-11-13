@@ -3,6 +3,7 @@ import { COLORS } from '../../constance/Colors'
 import { HorizontalContainer, SlideShow } from '../../components'
 import { ELEMENTS } from '../../constance/Elements'
 import { TMBD_ROUTE } from '../../constance/constance'
+import { PATHS } from '../../constance/paths'
 
 export default class Movies extends Lightning.Component {
   _updateTimeout = null
@@ -136,6 +137,15 @@ export default class Movies extends Lightning.Component {
     })
   }
 
+  _handleBack() {
+    const history = Router.getHistory()
+
+    if (history.length) {
+      Router.back()
+    } else {
+      Router.navigate(PATHS.HOME)
+    }
+  }
   _horizontalContainerIndexChange(newIndex) {
     if (this._updateTimeout) {
       clearTimeout(this._updateTimeout)

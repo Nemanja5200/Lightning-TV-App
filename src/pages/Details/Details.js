@@ -5,6 +5,7 @@ import { ELEMENTS } from '../../constance/Elements'
 import { Router, Utils } from '@lightningjs/sdk'
 import { IMAGE_PATH } from '../../constance/Images'
 import { TMBD_ROUTE } from '../../constance/constance'
+import { PATHS } from '../../constance/paths'
 
 export default class Details extends Lightning.Component {
   static _template() {
@@ -265,10 +266,25 @@ export default class Details extends Lightning.Component {
         }
 
         _handleEnter() {
-          Router.back()
-          return true
+          const history = Router.getHistory()
+
+          if (history.length) {
+            Router.back()
+          } else {
+            Router.navigate(PATHS.HOME)
+          }
         }
       },
     ]
+  }
+
+  _handleBack() {
+    const history = Router.getHistory()
+
+    if (history.length) {
+      Router.back()
+    } else {
+      Router.navigate(PATHS.HOME)
+    }
   }
 }
