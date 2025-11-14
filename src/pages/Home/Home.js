@@ -10,10 +10,11 @@ export default class Home extends Lightning.Component {
     return {
       x: 0,
       y: 0,
+      zIndex: 1,
       Background: {
         w: 1920,
         h: 1080,
-        zIndex: -1,
+        src: Utils.asset('images/background.png'),
       },
       Content: {
         x: 64,
@@ -70,10 +71,6 @@ export default class Home extends Lightning.Component {
   }
 
   _init() {
-    this.tag('Background').patch({
-      src: Utils.asset('images/background.png'),
-    })
-
     if (this._homeData) {
       this.tag(ELEMENTS.MOVIES).patch({
         props: {

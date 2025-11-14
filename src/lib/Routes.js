@@ -1,9 +1,10 @@
-import { Details, Home, Movies, Player } from '../pages'
+import { Details, Home, Movies } from '../pages'
 import { ELEMENTS } from '../constance/Elements'
 import { PATHS } from '../constance/paths'
 import fetchHomeData from '../pages/Home/data/fetchHomeData'
 import fetchDetailsData from '../pages/Details/data/fetchDetailsData'
 import fetchMoviesData from '../pages/Movies/data/fetchMoviesData'
+import { MoviePlayer } from '../components'
 
 export default {
   root: PATHS.HOME,
@@ -29,7 +30,7 @@ export default {
 
     {
       path: `${PATHS.PLAYER}`,
-      component: Player,
+      component: MoviePlayer,
     },
   ],
 }

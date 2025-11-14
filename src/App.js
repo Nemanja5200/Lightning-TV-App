@@ -23,19 +23,19 @@ export default class App extends Router.App {
         w: 1920,
         h: 1080,
       },
-      Loading: {
-        type: LoadingScreenComponent,
-        rect: true,
-        w: 1920,
-        h: 1080,
-        zIndex: 102,
-        color: Colors('#000000').get(),
-        visible: true,
-        props: {
-          xPos: 960,
-          yPos: 540,
-        },
-      },
+      // Loading: {
+      //   type: LoadingScreenComponent,
+      //   rect: true,
+      //   w: 1920,
+      //   h: 1080,
+      //   zIndex: 102,
+      //   color: Colors('#000000').get(),
+      //   visible: true,
+      //   props: {
+      //     xPos: 960,
+      //     yPos: 540,
+      //   },
+      // },
       Widgets: {
         NavBar: {
           type: NavBar,
@@ -48,7 +48,6 @@ export default class App extends Router.App {
         h: 1080,
         rect: true,
         color: COLORS.BACKGROUND,
-        zIndex: -2,
       },
     }
   }
@@ -63,7 +62,6 @@ export default class App extends Router.App {
 
   $punchHole() {
     this.tag('Background').shader = {
-      color: Colors('#1F2227').get(),
       type: Lightning.shaders.Hole,
       x: 0,
       y: 0,

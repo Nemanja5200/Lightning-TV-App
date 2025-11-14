@@ -131,9 +131,6 @@ export default class Movies extends Lightning.Component {
           },
         },
       },
-      Background: {
-        color: props.bgColor || 0xff000000,
-      },
     })
   }
 

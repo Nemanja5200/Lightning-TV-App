@@ -10,6 +10,7 @@ import { PATHS } from '../../constance/paths'
 export default class Details extends Lightning.Component {
   static _template() {
     return {
+      zIndex: 1,
       Background: {
         w: 1920,
         h: 1080,
