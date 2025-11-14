@@ -44,8 +44,8 @@ export default class PlayerButton extends Lightning.Component {
   set icon(config) {
     this.tag('Icon').patch({
       src: config.src || config,
-      w: config.width || 30,
-      h: config.height || 30,
+      w: config.width || 35,
+      h: config.height || 35,
     })
   }
 

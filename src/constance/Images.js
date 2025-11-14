@@ -9,4 +9,5 @@ export const IMAGE_PATH = {
   PLAYER_PREV: 'playerUI/prev.png',
   PLAYER_FORWARD: 'playerUI/forward.png',
   PLAYER_PAUSE: 'playerUI/Pause.png',
+  PLAYER_PLAY: 'playerUI/Play.png',
 }

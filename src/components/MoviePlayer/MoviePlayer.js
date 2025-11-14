@@ -1,11 +1,13 @@
-import { Utils, VideoPlayer } from '@lightningjs/sdk'
+import { Router, Utils, VideoPlayer } from '@lightningjs/sdk'
 import Lightning from '@lightningjs/sdk/src/Lightning'
 import { loader, unloader } from './components/HLS'
 import PlayerButton from './components/PlayerButton'
 import { IMAGE_PATH } from '../../constance/Images'
 import { ELEMENTS } from '../../constance/Elements'
+import { PATHS } from '../../constance/paths'
 
 export default class MoviePlayer extends Lightning.Component {
+  _isPaused = false
   static _template() {
     return {
       Back: {
@@ -63,11 +65,6 @@ export default class MoviePlayer extends Lightning.Component {
   }
 
   _init() {
-    console.log('MoviePlayer _init called')
-    console.log('Back:', this.Back)
-    console.log('Prev:', this.Prev)
-    console.log('PausePlay:', this.PausePlay)
-    console.log('Forward:', this.Forward)
     this.patch({
       Back: {
         icon: Utils.asset(IMAGE_PATH.PLAYAER_BACK_BTN),
@@ -89,6 +86,18 @@ export default class MoviePlayer extends Lightning.Component {
       },
     })
     this._setState('Back')
+  }
+
+  _updatePlayPauseIcon() {
+    this.PausePlay.patch({
+      icon: {
+        src: this._isPaused
+          ? Utils.asset(IMAGE_PATH.PLAYER_PLAY)
+          : Utils.asset(IMAGE_PATH.PLAYER_PAUSE),
+        width: 70,
+        height: 70,
+      },
+    })
   }
 
   _enable() {
@@ -120,16 +129,24 @@ export default class MoviePlayer extends Lightning.Component {
         }
 
         _handleEnter() {
-          // Handle back button press
-          console.log('Back pressed')
-          // Router.back() or whatever action you want
+          this._handleBack()
           return true
+        }
+
+        _handleBack() {
+          const history = Router.getHistory()
+
+          if (history.length) {
+            Router.back()
+          } else {
+            Router.navigate(PATHS.HOME)
+          }
         }
       },
 
       class Controls extends this {
         $enter() {
-          this._controlIndex = 0 // Start at first control (Prev)
+          this._controlIndex = 0
         }
 
         _getFocused() {
@@ -148,27 +165,26 @@ export default class MoviePlayer extends Lightning.Component {
 
         _handleRight() {
           if (this._controlIndex < 2) {
-            // 2 is the last index (Forward)
             this._controlIndex++
           }
           return true
         }
 
         _handleEnter() {
-          // Handle button press based on which control is focused
           const buttons = ['Prev', 'PausePlay', 'Forward']
           const focusedButton = buttons[this._controlIndex]
-          console.log(`${focusedButton} pressed`)
 
           switch (focusedButton) {
             case 'Prev':
-              // Handle previous
+              if (!this._isPaused) VideoPlayer.skip(-10)
               break
             case 'PausePlay':
-              // Handle pause/play
+              this._isPaused = !this._isPaused
+              VideoPlayer.playPause()
+              this._updatePlayPauseIcon()
               break
             case 'Forward':
-              // Handle forward
+              if (!this._isPaused) VideoPlayer.skip(10)
               break
           }
           return true
