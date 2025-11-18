@@ -11,98 +11,162 @@ export default class MoviePlayer extends Lightning.Component {
   _progressInterval = null
   _isSeeking = false
   _seekTimeout = null
+  _hideControlsTimeout = null
+  _controlsVisible = true
 
   static _template() {
     return {
-      Back: {
-        type: PlayerButton,
-        w: 86,
-        h: 86,
-        x: 115,
-        y: 836,
-        zIndex: 10,
-      },
-      Controls: {
-        w: 312,
-        h: 90,
-        y: 836,
-        x: 804,
-        flex: { direction: 'row', alignItems: 'center' },
-        Prev: {
+      ControlsContainer: {
+        w: 1920,
+        h: 1080,
+        alpha: 1,
+        Back: {
           type: PlayerButton,
           w: 86,
           h: 86,
-          flexItem: { marginRight: 45 },
+          x: 115,
+          y: 836,
           zIndex: 10,
         },
-        PausePlay: {
-          type: PlayerButton,
-          w: 95,
-          h: 95,
-          flexItem: { marginRight: 45 },
+        Controls: {
+          w: 312,
+          h: 90,
+          y: 836,
+          x: 804,
+          flex: { direction: 'row', alignItems: 'center' },
+          Prev: {
+            type: PlayerButton,
+            w: 86,
+            h: 86,
+            flexItem: { marginRight: 45 },
+            zIndex: 10,
+          },
+          PausePlay: {
+            type: PlayerButton,
+            w: 95,
+            h: 95,
+            flexItem: { marginRight: 45 },
+            zIndex: 10,
+          },
+          Forward: {
+            type: PlayerButton,
+            w: 86,
+            h: 86,
+            zIndex: 10,
+          },
+        },
+        ProgressBar: {
+          type: ProgressBar,
+          x: 115,
+          y: 961,
+          signals: {
+            applySkip: '_applySkip',
+          },
           zIndex: 10,
         },
-        Forward: {
-          type: PlayerButton,
-          w: 86,
-          h: 86,
-          zIndex: 10,
-        },
-      },
-      ProgressBar: {
-        type: ProgressBar,
-        x: 115,
-        y: 961,
-        signals: {
-          applySkip: '_applySkip',
-        },
-        zIndex: 10,
       },
     }
   }
 
   get Back() {
-    return this.tag('Back')
+    return this.tag('ControlsContainer.Back')
   }
 
   get Prev() {
-    return this.tag('Controls.Prev')
+    return this.tag('ControlsContainer.Controls.Prev')
   }
 
   get PausePlay() {
-    return this.tag('Controls.PausePlay')
+    return this.tag('ControlsContainer.Controls.PausePlay')
   }
 
   get Forward() {
-    return this.tag('Controls.Forward')
+    return this.tag('ControlsContainer.Controls.Forward')
   }
 
   get ProgressBar() {
-    return this.tag('ProgressBar')
+    return this.tag('ControlsContainer.ProgressBar')
+  }
+
+  get ControlsContainer() {
+    return this.tag('ControlsContainer')
   }
 
   _init() {
     this.patch({
-      Back: {
-        icon: Utils.asset(IMAGE_PATH.PLAYAER_BACK_BTN),
-      },
-      Controls: {
-        Prev: {
-          icon: Utils.asset(IMAGE_PATH.PLAYER_PREV),
+      ControlsContainer: {
+        Back: {
+          icon: Utils.asset(IMAGE_PATH.PLAYAER_BACK_BTN),
         },
-        PausePlay: {
-          icon: {
-            src: Utils.asset(IMAGE_PATH.PLAYER_PAUSE),
-            width: 70,
-            height: 70,
+        Controls: {
+          Prev: {
+            icon: Utils.asset(IMAGE_PATH.PLAYER_PREV),
           },
-        },
-        Forward: {
-          icon: Utils.asset(IMAGE_PATH.PLAYER_FORWARD),
+          PausePlay: {
+            icon: {
+              src: Utils.asset(IMAGE_PATH.PLAYER_PAUSE),
+              width: 70,
+              height: 70,
+            },
+          },
+          Forward: {
+            icon: Utils.asset(IMAGE_PATH.PLAYER_FORWARD),
+          },
         },
       },
     })
     this._setState('Back')
+  }
+
+  _showControls() {
+    this._controlsVisible = true
+
+    this.ControlsContainer.setSmooth('alpha', 1, {
+      duration: 0.3,
+      timingFunction: 'ease-out',
+    })
+
+    this._resetHideTimer()
+  }
+
+  _hideControls() {
+    this._controlsVisible = false
+
+    this.ControlsContainer.setSmooth('alpha', 0, {
+      duration: 0.5,
+      timingFunction: 'ease-in',
+    })
+
+    if (this._hideControlsTimeout) {
+      clearTimeout(this._hideControlsTimeout)
+      this._hideControlsTimeout = null
+    }
+  }
+
+  _resetHideTimer() {
+    if (this._hideControlsTimeout) {
+      clearTimeout(this._hideControlsTimeout)
+    }
+
+    if (this._isPaused) {
+      return
+    }
+
+    this._hideControlsTimeout = setTimeout(() => {
+      if (!this._isPaused) {
+        this._hideControls()
+      }
+    }, 5000)
+  }
+
+  _handleAnyKey() {
+    if (!this._controlsVisible) {
+      this._showControls()
+      return true
+    }
+
+    this._resetHideTimer()
+    return false
   }
 
   _updatePlayPauseIcon() {
@@ -150,20 +214,29 @@ export default class MoviePlayer extends Lightning.Component {
   _resetUI() {
     this._isPaused = false
     this._isSeeking = false
+    this._controlsVisible = true
 
     if (this._seekTimeout) {
       clearTimeout(this._seekTimeout)
       this._seekTimeout = null
     }
 
+    if (this._hideControlsTimeout) {
+      clearTimeout(this._hideControlsTimeout)
+      this._hideControlsTimeout = null
+    }
+
+    this.ControlsContainer.alpha = 1
     this.ProgressBar.reset()
     this.patch({
-      Controls: {
-        PausePlay: {
-          icon: {
-            src: Utils.asset(IMAGE_PATH.PLAYER_PAUSE),
-            width: 70,
-            height: 70,
+      ControlsContainer: {
+        Controls: {
+          PausePlay: {
+            icon: {
+              src: Utils.asset(IMAGE_PATH.PLAYER_PAUSE),
+              width: 70,
+              height: 70,
+            },
           },
         },
       },
@@ -182,6 +255,8 @@ export default class MoviePlayer extends Lightning.Component {
     VideoPlayer.open('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')
     VideoPlayer.play()
     this._startProgressUpdates()
+
+    this._resetHideTimer()
   }
 
   _disable() {
@@ -191,6 +266,11 @@ export default class MoviePlayer extends Lightning.Component {
     if (this._seekTimeout) {
       clearTimeout(this._seekTimeout)
       this._seekTimeout = null
+    }
+
+    if (this._hideControlsTimeout) {
+      clearTimeout(this._hideControlsTimeout)
+      this._hideControlsTimeout = null
     }
 
     VideoPlayer.clear()
@@ -219,16 +299,19 @@ export default class MoviePlayer extends Lightning.Component {
         }
 
         _handleRight() {
+          this._handleAnyKey()
           this._setState('Controls')
           return true
         }
 
         _handleDown() {
+          this._handleAnyKey()
           this._setState('ProgressBar')
           return true
         }
 
         _handleEnter() {
+          this._handleAnyKey()
           this._handleBack()
           return true
         }
@@ -240,6 +323,20 @@ export default class MoviePlayer extends Lightning.Component {
           } else {
             Router.navigate(PATHS.HOME)
           }
+        }
+
+        _captureKey() {
+          if (this._handleAnyKey()) {
+            return true
+          }
+          return false
+        }
+
+        _handleUp() {
+          return this._captureKey() || false
+        }
+        _handleLeft() {
+          return this._captureKey() || false
         }
       },
 
@@ -254,6 +351,7 @@ export default class MoviePlayer extends Lightning.Component {
         }
 
         _handleLeft() {
+          this._handleAnyKey()
           if (this._controlIndex > 0) {
             this._controlIndex--
           } else {
@@ -263,6 +361,7 @@ export default class MoviePlayer extends Lightning.Component {
         }
 
         _handleRight() {
+          this._handleAnyKey()
           if (this._controlIndex < 2) {
             this._controlIndex++
           }
@@ -270,11 +369,13 @@ export default class MoviePlayer extends Lightning.Component {
         }
 
         _handleDown() {
+          this._handleAnyKey()
           this._setState('ProgressBar')
           return true
         }
 
         _handleEnter() {
+          this._handleAnyKey()
           const buttons = ['Prev', 'PausePlay', 'Forward']
           const focusedButton = buttons[this._controlIndex]
 
@@ -286,12 +387,33 @@ export default class MoviePlayer extends Lightning.Component {
               this._isPaused = !this._isPaused
               VideoPlayer.playPause()
               this._updatePlayPauseIcon()
+
+              if (this._isPaused) {
+                this._showControls()
+                if (this._hideControlsTimeout) {
+                  clearTimeout(this._hideControlsTimeout)
+                  this._hideControlsTimeout = null
+                }
+              } else {
+                this._resetHideTimer()
+              }
               break
             case 'Forward':
               VideoPlayer.skip(+5)
               break
           }
           return true
+        }
+
+        _captureKey() {
+          if (this._handleAnyKey()) {
+            return true
+          }
+          return false
+        }
+
+        _handleUp() {
+          return this._captureKey() || false
         }
       },
 
@@ -301,8 +423,33 @@ export default class MoviePlayer extends Lightning.Component {
         }
 
         _handleUp() {
+          this._handleAnyKey()
           this._setState('Controls')
           return true
+        }
+
+        _handleLeft() {
+          this._handleAnyKey()
+          return false
+        }
+
+        _handleRight() {
+          this._handleAnyKey()
+          return false
+        }
+
+        _handleDown() {
+          return this._handleAnyKey() || false
+        }
+
+        _handleLeftRelease() {
+          this._handleAnyKey()
+          return false
+        }
+
+        _handleRightRelease() {
+          this._handleAnyKey()
+          return false
         }
       },
     ]

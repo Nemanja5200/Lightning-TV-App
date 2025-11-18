@@ -1,5 +1,6 @@
 import Lightning from '@lightningjs/sdk/src/Lightning'
 import { formatTime } from '../../../utils/Functions'
+import { VideoPlayer } from '@lightningjs/sdk'
 
 export default class ProgressBar extends Lightning.Component {
   _skipInterval = null
@@ -127,7 +128,7 @@ export default class ProgressBar extends Lightning.Component {
     }
 
     if (this._previewTime === undefined) {
-      this._previewTime = this._currentTime
+      this._previewTime = VideoPlayer.currentTime
     }
     const applyIncrement = () => {
       this._previewTime += skipIncrement
@@ -168,12 +169,12 @@ export default class ProgressBar extends Lightning.Component {
 
   _handleLeft() {
     this._startSkipping('backward')
-    return true
+    return false
   }
 
   _handleRight() {
     this._startSkipping('forward')
-    return true
+    return false
   }
 
   _handleLeftRelease() {
