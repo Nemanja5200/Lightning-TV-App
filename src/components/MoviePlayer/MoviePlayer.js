@@ -197,20 +197,16 @@ export default class MoviePlayer extends Lightning.Component {
     this._resetUI()
   }
 
-  _applySkip(skipAmount) {
-    console.log('Applying skip:', skipAmount)
-
+  _applySkip(time) {
     if (this._seekTimeout) {
       clearTimeout(this._seekTimeout)
     }
 
     this._isSeeking = true
-
-    VideoPlayer.skip(skipAmount)
+    VideoPlayer.seek(time)
 
     this._seekTimeout = setTimeout(() => {
       this._isSeeking = false
-      this._updateProgress()
       this._seekTimeout = null
     }, 500)
   }

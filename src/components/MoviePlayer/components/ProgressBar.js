@@ -69,22 +69,16 @@ export default class ProgressBar extends Lightning.Component {
     }
   }
 
-  updateProgress(currentTime, duration) {
+  updateProgress(previewTime, duration) {
     if (!isFinite(duration) || duration === 0) {
       return
     }
 
-    this._currentTime = currentTime
     this._duration = duration
 
-    this._displayTime =
-      this._skipAmount !== 0
-        ? Math.max(0, Math.min(duration, currentTime + this._skipAmount))
-        : currentTime
-
+    this._displayTime = Math.max(0, Math.min(duration, previewTime))
     const remainingTime = Math.max(0, duration - this._displayTime)
     const progressBarWidth = (this._displayTime / duration) * 1404
-
     this.patch({
       CurrentTime: {
         text: { text: formatTime(this._displayTime) },
@@ -132,38 +126,32 @@ export default class ProgressBar extends Lightning.Component {
       this._skipInterval = null
     }
 
-    this._skipAmount += skipIncrement
-    const maxSkip = this._duration - this._currentTime
-    const minSkip = -this._currentTime
-    this._skipAmount = Math.max(minSkip, Math.min(maxSkip, this._skipAmount))
-    this.updateProgress(this._currentTime, this._duration)
+    if (this._previewTime === undefined) {
+      this._previewTime = this._currentTime
+    }
+    const applyIncrement = () => {
+      this._previewTime += skipIncrement
+      this._previewTime = Math.max(0, Math.min(this._duration, this._previewTime))
+      this.updateProgress(this._previewTime, this._duration)
+    }
 
-    this._skipInterval = setInterval(() => {
-      this._skipAmount += skipIncrement
-
-      const maxSkip = this._duration - this._currentTime
-      const minSkip = -this._currentTime
-      this._skipAmount = Math.max(minSkip, Math.min(maxSkip, this._skipAmount))
-
-      this.updateProgress(this._currentTime, this._duration)
-    }, 100)
+    applyIncrement()
+    this._skipInterval = setInterval(applyIncrement, 1000)
   }
+
   _stopSkipping() {
     if (this._skipInterval) {
       clearInterval(this._skipInterval)
       this._skipInterval = null
     }
 
-    if (this._skipInterval) {
-      clearInterval(this._skipInterval)
-      this._skipInterval = null
-    }
-
-    if (this._skipAmount !== 0) {
-      this.signal('applySkip', this._skipAmount, this._currentTime + this._skipAmount)
-      this._skipAmount = 0
+    if (this._previewTime !== undefined) {
+      this.signal('applySkip', this._previewTime)
+      this._currentTime = this._previewTime
+      this._previewTime = undefined
     }
   }
+
   _focus() {
     this.tag('Dot').setSmooth('alpha', 1, { duration: 0.3 })
   }
