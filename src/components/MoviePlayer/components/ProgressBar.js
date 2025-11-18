@@ -77,26 +77,25 @@ export default class ProgressBar extends Lightning.Component {
     this._currentTime = currentTime
     this._duration = duration
 
-    const displayTime =
+    this._displayTime =
       this._skipAmount !== 0
         ? Math.max(0, Math.min(duration, currentTime + this._skipAmount))
         : currentTime
 
-    const remainingTime = Math.max(0, duration - displayTime)
-    const progressBarWidth = (displayTime / duration) * 1404
+    const remainingTime = Math.max(0, duration - this._displayTime)
+    const progressBarWidth = (this._displayTime / duration) * 1404
 
     this.patch({
       CurrentTime: {
-        text: { text: formatTime(displayTime) },
+        text: { text: formatTime(this._displayTime) },
       },
       RemainingTime: {
         text: { text: `-${formatTime(remainingTime)}` },
       },
-      Bar: {
-        ProgressColor: { w: progressBarWidth },
-        Dot: { x: progressBarWidth },
-      },
     })
+
+    this.tag('ProgressColor').setSmooth('w', progressBarWidth, { duration: 0.2 })
+    this.tag('Dot').setSmooth('x', progressBarWidth, { duration: 0.2 })
   }
 
   reset() {
@@ -128,49 +127,31 @@ export default class ProgressBar extends Lightning.Component {
   _startSkipping(direction) {
     const skipIncrement = direction === 'forward' ? 5 : -5
 
-    if (this._skipDirection !== direction || !this._isHolding) {
-      if (this._skipDirection && this._skipDirection !== direction) {
-        this._stopSkipping()
-      }
+    if (this._skipInterval) {
+      clearInterval(this._skipInterval)
+      this._skipInterval = null
+    }
 
-      this._skipDirection = direction
+    this._skipAmount += skipIncrement
+    const maxSkip = this._duration - this._currentTime
+    const minSkip = -this._currentTime
+    this._skipAmount = Math.max(minSkip, Math.min(maxSkip, this._skipAmount))
+    this.updateProgress(this._currentTime, this._duration)
 
-      if (!this._isHolding) {
-        this._skipAmount = skipIncrement
-      } else {
-        this._skipAmount += skipIncrement
-      }
+    this._skipInterval = setInterval(() => {
+      this._skipAmount += skipIncrement
+
+      const maxSkip = this._duration - this._currentTime
+      const minSkip = -this._currentTime
+      this._skipAmount = Math.max(minSkip, Math.min(maxSkip, this._skipAmount))
 
       this.updateProgress(this._currentTime, this._duration)
-
-      if (this._holdTimeout) {
-        clearTimeout(this._holdTimeout)
-        this._holdTimeout = null
-      }
-
-      this._holdTimeout = setTimeout(() => {
-        if (this._skipDirection === direction) {
-          this._isHolding = true
-
-          this._skipInterval = setInterval(() => {
-            this._skipAmount += skipIncrement
-
-            const maxSkip = this._duration - this._currentTime
-            const minSkip = -this._currentTime
-            this._skipAmount = Math.max(minSkip, Math.min(maxSkip, this._skipAmount))
-
-            this.updateProgress(this._currentTime, this._duration)
-          }, 100)
-        }
-        this._holdTimeout = null
-      }, 150)
-    }
+    }, 100)
   }
-
   _stopSkipping() {
-    if (this._holdTimeout) {
-      clearTimeout(this._holdTimeout)
-      this._holdTimeout = null
+    if (this._skipInterval) {
+      clearInterval(this._skipInterval)
+      this._skipInterval = null
     }
 
     if (this._skipInterval) {
@@ -179,14 +160,10 @@ export default class ProgressBar extends Lightning.Component {
     }
 
     if (this._skipAmount !== 0) {
-      this.signal('applySkip', this._skipAmount)
+      this.signal('applySkip', this._skipAmount, this._currentTime + this._skipAmount)
       this._skipAmount = 0
     }
-
-    this._skipDirection = null
-    this._isHolding = false
   }
-
   _focus() {
     this.tag('Dot').setSmooth('alpha', 1, { duration: 0.3 })
   }

@@ -292,7 +292,7 @@ export default class MoviePlayer extends Lightning.Component {
               this._updatePlayPauseIcon()
               break
             case 'Forward':
-              VideoPlayer.skip(5)
+              VideoPlayer.skip(+5)
               break
           }
           return true
