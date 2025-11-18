@@ -3,16 +3,13 @@ import Lightning from '@lightningjs/sdk/src/Lightning'
 import { loader, unloader } from './components/HLS'
 import PlayerButton from './components/PlayerButton'
 import { IMAGE_PATH } from '../../constance/Images'
-import { ELEMENTS } from '../../constance/Elements'
 import { PATHS } from '../../constance/paths'
-import { ProgressBar } from '@lightningjs/ui-components'
-import { formatTime } from '../../utils/Functions'
+import ProgressBar from './components/ProgressBar'
 
 export default class MoviePlayer extends Lightning.Component {
   _isPaused = false
-  _CurrentTime = '00:00'
-  _Duration = '00:00'
-  _RemaningTime = '00:00'
+  _progressInterval = null
+
   static _template() {
     return {
       Back: {
@@ -50,36 +47,15 @@ export default class MoviePlayer extends Lightning.Component {
           zIndex: 10,
         },
       },
-
       ProgressBar: {
-        w: 1690,
-        h: 156,
+        type: ProgressBar,
         x: 115,
         y: 961,
+        signals: {
+          seekForward: '_seekForward',
+          seekBackward: '_seekBackward',
+        },
         zIndex: 10,
-        CurrentTime: {
-          x: 0,
-          y: 0,
-          text: {
-            text: '00:00',
-            fontSize: 26,
-            fontFace: 'Inter-Bold',
-            textColor: 0xffffffff,
-          },
-          zIndex: 10,
-        },
-        Bar: {},
-        RemaningTime: {
-          x: 1600,
-          y: 0,
-          text: {
-            text: '00:00',
-            fontSize: 26,
-            fontFace: 'Inter-Bold',
-            textColor: 0xffffffff,
-          },
-          zIndex: 10,
-        },
       },
     }
   }
@@ -128,19 +104,6 @@ export default class MoviePlayer extends Lightning.Component {
     this._setState('Back')
   }
 
-  _active() {
-    this.patch({
-      ProgressBar: {
-        CurrentTime: {
-          text: { text: this._CurrentTime },
-        },
-
-        RemaningTime: {
-          text: { text: this._Duration },
-        },
-      },
-    })
-  }
   _updatePlayPauseIcon() {
     this.PausePlay.patch({
       icon: {
@@ -156,33 +119,17 @@ export default class MoviePlayer extends Lightning.Component {
   _updateProgress() {
     const currentTime = VideoPlayer.currentTime || 0
     const duration = VideoPlayer.duration || 0
-    const remaningTime = Math.max(0, duration - currentTime)
 
-    if (!isFinite(duration) || duration < 0) {
+    if (!isFinite(duration) || duration === 0) {
       return
     }
 
-    this._CurrentTime = currentTime
-    this._Duration = duration
-    this._RemaningTime = remaningTime
-
-    this.patch({
-      ProgressBar: {
-        CurrentTime: {
-          text: { text: formatTime(this._CurrentTime) },
-        },
-        RemaningTime: {
-          text: { text: formatTime(this._RemaningTime) },
-        },
-      },
-    })
+    this.ProgressBar.updateProgress(currentTime, duration)
   }
 
   _startProgressUpdates() {
     this._stopProgressUpdates()
-
     this._updateProgress()
-
     this._progressInterval = setInterval(() => {
       this._updateProgress()
     }, 1000)
@@ -194,7 +141,25 @@ export default class MoviePlayer extends Lightning.Component {
       this._progressInterval = null
     }
   }
+
+  _resetUI() {
+    this._isPaused = false
+    this.ProgressBar.reset()
+    this.patch({
+      Controls: {
+        PausePlay: {
+          icon: {
+            src: Utils.asset(IMAGE_PATH.PLAYER_PAUSE),
+            width: 70,
+            height: 70,
+          },
+        },
+      },
+    })
+  }
+
   _enable() {
+    this._resetUI()
     this.fireAncestors('$punchHole')
     VideoPlayer.position(0, 0)
     VideoPlayer.size(1920, 1080)
@@ -209,8 +174,26 @@ export default class MoviePlayer extends Lightning.Component {
 
   _disable() {
     this.fireAncestors('$unpunchHole')
+    this._stopProgressUpdates()
     VideoPlayer.clear()
+    this._resetUI()
   }
+  _seekBackward() {
+    VideoPlayer.skip(-10)
+  }
+
+  _seekForward() {
+    VideoPlayer.skip(10)
+  }
+
+  _seekBackward() {
+    VideoPlayer.skip(-10)
+  }
+
+  _seekForward() {
+    VideoPlayer.skip(10)
+  }
+
   static _states() {
     return [
       class Back extends this {
@@ -223,6 +206,11 @@ export default class MoviePlayer extends Lightning.Component {
           return true
         }
 
+        _handleDown() {
+          this._setState('ProgressBar')
+          return true
+        }
+
         _handleEnter() {
           this._handleBack()
           return true
@@ -230,7 +218,6 @@ export default class MoviePlayer extends Lightning.Component {
 
         _handleBack() {
           const history = Router.getHistory()
-
           if (history.length) {
             Router.back()
           } else {
@@ -265,13 +252,18 @@ export default class MoviePlayer extends Lightning.Component {
           return true
         }
 
+        _handleDown() {
+          this._setState('ProgressBar')
+          return true
+        }
+
         _handleEnter() {
           const buttons = ['Prev', 'PausePlay', 'Forward']
           const focusedButton = buttons[this._controlIndex]
 
           switch (focusedButton) {
             case 'Prev':
-              if (!this._isPaused) VideoPlayer.skip(-10)
+              VideoPlayer.skip(-10)
               break
             case 'PausePlay':
               this._isPaused = !this._isPaused
@@ -279,9 +271,20 @@ export default class MoviePlayer extends Lightning.Component {
               this._updatePlayPauseIcon()
               break
             case 'Forward':
-              if (!this._isPaused) VideoPlayer.skip(10)
+              VideoPlayer.skip(10)
               break
           }
+          return true
+        }
+      },
+
+      class ProgressBar extends this {
+        _getFocused() {
+          return this.ProgressBar
+        }
+
+        _handleUp() {
+          this._setState('Controls')
           return true
         }
       },
