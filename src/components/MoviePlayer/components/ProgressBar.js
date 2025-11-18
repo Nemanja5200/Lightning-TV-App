@@ -2,6 +2,14 @@ import Lightning from '@lightningjs/sdk/src/Lightning'
 import { formatTime } from '../../../utils/Functions'
 
 export default class ProgressBar extends Lightning.Component {
+  _skipInterval = null
+  _skipAmount = 0
+  _currentTime = 0
+  _duration = 0
+  _skipDirection = null
+  _isHolding = false
+  _holdTimeout = null
+
   static _template() {
     return {
       w: 1690,
@@ -66,12 +74,20 @@ export default class ProgressBar extends Lightning.Component {
       return
     }
 
-    const remainingTime = Math.max(0, duration - currentTime)
-    const progressBarWidth = (currentTime / duration) * 1404
+    this._currentTime = currentTime
+    this._duration = duration
+
+    const displayTime =
+      this._skipAmount !== 0
+        ? Math.max(0, Math.min(duration, currentTime + this._skipAmount))
+        : currentTime
+
+    const remainingTime = Math.max(0, duration - displayTime)
+    const progressBarWidth = (displayTime / duration) * 1404
 
     this.patch({
       CurrentTime: {
-        text: { text: formatTime(currentTime) },
+        text: { text: formatTime(displayTime) },
       },
       RemainingTime: {
         text: { text: `-${formatTime(remainingTime)}` },
@@ -84,6 +100,17 @@ export default class ProgressBar extends Lightning.Component {
   }
 
   reset() {
+    this._stopSkipping()
+    this._skipAmount = 0
+    this._currentTime = 0
+    this._duration = 0
+    this._isHolding = false
+
+    if (this._holdTimeout) {
+      clearTimeout(this._holdTimeout)
+      this._holdTimeout = null
+    }
+
     this.patch({
       CurrentTime: {
         text: { text: '00:00' },
@@ -98,29 +125,104 @@ export default class ProgressBar extends Lightning.Component {
     })
   }
 
+  _startSkipping(direction) {
+    const skipIncrement = direction === 'forward' ? 5 : -5
+
+    if (this._skipDirection !== direction || !this._isHolding) {
+      if (this._skipDirection && this._skipDirection !== direction) {
+        this._stopSkipping()
+      }
+
+      this._skipDirection = direction
+
+      if (!this._isHolding) {
+        this._skipAmount = skipIncrement
+      } else {
+        this._skipAmount += skipIncrement
+      }
+
+      this.updateProgress(this._currentTime, this._duration)
+
+      if (this._holdTimeout) {
+        clearTimeout(this._holdTimeout)
+        this._holdTimeout = null
+      }
+
+      this._holdTimeout = setTimeout(() => {
+        if (this._skipDirection === direction) {
+          this._isHolding = true
+
+          this._skipInterval = setInterval(() => {
+            this._skipAmount += skipIncrement
+
+            const maxSkip = this._duration - this._currentTime
+            const minSkip = -this._currentTime
+            this._skipAmount = Math.max(minSkip, Math.min(maxSkip, this._skipAmount))
+
+            this.updateProgress(this._currentTime, this._duration)
+          }, 100)
+        }
+        this._holdTimeout = null
+      }, 150)
+    }
+  }
+
+  _stopSkipping() {
+    if (this._holdTimeout) {
+      clearTimeout(this._holdTimeout)
+      this._holdTimeout = null
+    }
+
+    if (this._skipInterval) {
+      clearInterval(this._skipInterval)
+      this._skipInterval = null
+    }
+
+    if (this._skipAmount !== 0) {
+      this.signal('applySkip', this._skipAmount)
+      this._skipAmount = 0
+    }
+
+    this._skipDirection = null
+    this._isHolding = false
+  }
+
   _focus() {
     this.tag('Dot').setSmooth('alpha', 1, { duration: 0.3 })
   }
 
   _unfocus() {
+    this._stopSkipping()
     this.tag('Dot').setSmooth('alpha', 0, { duration: 0.3 })
   }
 
   _handleUp() {
+    this._stopSkipping()
     return false
   }
 
   _handleLeft() {
-    this.signal('seekBackward')
+    this._startSkipping('backward')
     return true
   }
 
   _handleRight() {
-    this.signal('seekForward')
+    this._startSkipping('forward')
+    return true
+  }
+
+  _handleLeftRelease() {
+    this._stopSkipping()
+    return true
+  }
+
+  _handleRightRelease() {
+    this._stopSkipping()
     return true
   }
 
   _handleDown() {
+    this._stopSkipping()
     return true
   }
 }

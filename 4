@@ -284,7 +284,7 @@ export default class MoviePlayer extends Lightning.Component {
 
           switch (focusedButton) {
             case 'Prev':
-              VideoPlayer.skip(-5)
+              this._seekBackward()
               break
             case 'PausePlay':
               this._isPaused = !this._isPaused
@@ -292,7 +292,7 @@ export default class MoviePlayer extends Lightning.Component {
               this._updatePlayPauseIcon()
               break
             case 'Forward':
-              VideoPlayer.skip(5)
+              this._seekForward()
               break
           }
           return true
