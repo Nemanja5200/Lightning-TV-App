@@ -118,7 +118,7 @@ export default class MoviePlayer extends Lightning.Component {
           },
           PausePlay: {
             icon: {
-              src: Utils.asset(IMAGE_PATH.PLAYER_PLAY),
+              src: Utils.asset(IMAGE_PATH.PLAYER_PAUSE),
               width: 70,
               height: 70,
             },
@@ -318,6 +318,10 @@ export default class MoviePlayer extends Lightning.Component {
   $videoPlayerSeeked() {
     this._isSeeking = false
     this.tag('Spinner').visible = false
+  }
+
+  $videoPlayerEnded() {
+    Router.back()
   }
   static _states() {
     return [
