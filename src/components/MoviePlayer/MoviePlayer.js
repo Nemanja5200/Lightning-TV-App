@@ -61,6 +61,8 @@ export default class MoviePlayer extends Lightning.Component {
           y: 961,
           signals: {
             applySkip: '_applySkip',
+            stopProgress: '_stopProgress',
+            startProgress: '_startProgress',
           },
           zIndex: 10,
         },
@@ -192,13 +194,11 @@ export default class MoviePlayer extends Lightning.Component {
     if (!isFinite(duration) || duration === 0) {
       return
     }
-
     this.ProgressBar.updateProgress(currentTime, duration)
   }
 
   _startProgressUpdates() {
     this._stopProgressUpdates()
-    this._updateProgress()
     this._progressInterval = setInterval(() => {
       this._updateProgress()
     }, 500)
@@ -290,7 +290,13 @@ export default class MoviePlayer extends Lightning.Component {
       this._seekTimeout = null
     }, 500)
   }
+  _startProgress() {
+    this._startProgressUpdates()
+  }
 
+  _stopProgress() {
+    this._stopProgressUpdates()
+  }
   static _states() {
     return [
       class Back extends this {

@@ -76,7 +76,6 @@ export default class ProgressBar extends Lightning.Component {
     }
 
     this._duration = duration
-
     this._displayTime = Math.max(0, Math.min(duration, previewTime))
     const remainingTime = Math.max(0, duration - this._displayTime)
     const progressBarWidth = (this._displayTime / duration) * 1404
@@ -120,6 +119,7 @@ export default class ProgressBar extends Lightning.Component {
   }
 
   _startSkipping(direction) {
+    this.signal('stopProgress')
     const skipIncrement = direction === 'forward' ? 5 : -5
 
     if (this._skipInterval) {
@@ -151,6 +151,8 @@ export default class ProgressBar extends Lightning.Component {
       this._currentTime = this._previewTime
       this._previewTime = undefined
     }
+
+    this.signal('startProgress')
   }
 
   _focus() {
