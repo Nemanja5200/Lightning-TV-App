@@ -106,7 +106,7 @@ export default class MoviePlayer extends Lightning.Component {
           },
           PausePlay: {
             icon: {
-              src: Utils.asset(IMAGE_PATH.PLAYER_PAUSE),
+              src: Utils.asset(IMAGE_PATH.PLAYER_PLAY),
               width: 70,
               height: 70,
             },

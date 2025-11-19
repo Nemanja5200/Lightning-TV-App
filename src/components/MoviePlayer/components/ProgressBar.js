@@ -8,9 +8,7 @@ export default class ProgressBar extends Lightning.Component {
   _currentTime = 0
   _duration = 0
   _skipDirection = null
-  _isHolding = false
-  _holdTimeout = null
-
+  _isSkipping = false
   static _template() {
     return {
       w: 1690,
@@ -99,11 +97,6 @@ export default class ProgressBar extends Lightning.Component {
     this._duration = 0
     this._isHolding = false
 
-    if (this._holdTimeout) {
-      clearTimeout(this._holdTimeout)
-      this._holdTimeout = null
-    }
-
     this.patch({
       CurrentTime: {
         text: { text: '00:00' },
@@ -117,10 +110,23 @@ export default class ProgressBar extends Lightning.Component {
       },
     })
   }
-
   _startSkipping(direction) {
+    if (this._isSkipping && this._skipDirection === direction) {
+      return
+    }
+
+    if (this._isSkipping && this._skipDirection !== direction) {
+      this._stopSkipping(false)
+    }
+
     this.signal('stopProgress')
-    const skipIncrement = direction === 'forward' ? 5 : -5
+    this._isSkipping = true
+    this._skipDirection = direction
+
+    const initialSkip = 1
+    const holdSkip = 10
+
+    const incrementBy = (dir, amount) => (dir === 'forward' ? amount : -amount)
 
     if (this._skipInterval) {
       clearInterval(this._skipInterval)
@@ -130,14 +136,16 @@ export default class ProgressBar extends Lightning.Component {
     if (this._previewTime === undefined) {
       this._previewTime = VideoPlayer.currentTime
     }
-    const applyIncrement = () => {
-      this._previewTime += skipIncrement
+
+    this._previewTime += incrementBy(direction, initialSkip)
+    this._previewTime = Math.max(0, Math.min(this._duration, this._previewTime))
+    this.updateProgress(this._previewTime, this._duration)
+
+    this._skipInterval = setInterval(() => {
+      this._previewTime += incrementBy(direction, holdSkip)
       this._previewTime = Math.max(0, Math.min(this._duration, this._previewTime))
       this.updateProgress(this._previewTime, this._duration)
-    }
-
-    applyIncrement()
-    this._skipInterval = setInterval(applyIncrement, 1000)
+    }, 100)
   }
 
   _stopSkipping() {
@@ -151,6 +159,9 @@ export default class ProgressBar extends Lightning.Component {
       this._currentTime = this._previewTime
       this._previewTime = undefined
     }
+
+    this._isSkipping = false
+    this._skipDirection = null
 
     this.signal('startProgress')
   }
