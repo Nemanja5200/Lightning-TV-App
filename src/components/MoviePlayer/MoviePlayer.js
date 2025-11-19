@@ -1,10 +1,11 @@
-import { Router, Utils, VideoPlayer } from '@lightningjs/sdk'
+import { Colors, Router, Utils, VideoPlayer } from '@lightningjs/sdk'
 import Lightning from '@lightningjs/sdk/src/Lightning'
 import { loader, unloader } from './components/HLS'
 import PlayerButton from './components/PlayerButton'
 import { IMAGE_PATH } from '../../constance/Images'
 import { PATHS } from '../../constance/paths'
 import ProgressBar from './components/ProgressBar'
+import LoadingScreenComponent from '../LoadingScreenComponent/LoadinScreenComponent'
 
 export default class MoviePlayer extends Lightning.Component {
   _isPaused = false
@@ -13,7 +14,6 @@ export default class MoviePlayer extends Lightning.Component {
   _seekTimeout = null
   _hideControlsTimeout = null
   _controlsVisible = true
-
   static _template() {
     return {
       ControlsContainer: {
@@ -65,6 +65,18 @@ export default class MoviePlayer extends Lightning.Component {
             startProgress: '_startProgress',
           },
           zIndex: 10,
+        },
+        Spinner: {
+          type: LoadingScreenComponent,
+          rect: true,
+          w: 1920,
+          h: 1080,
+          color: Colors('#000000').alpha(0).get(),
+          visible: false,
+          props: {
+            xPos: 960,
+            yPos: 540,
+          },
         },
       },
     }
@@ -296,6 +308,16 @@ export default class MoviePlayer extends Lightning.Component {
 
   _stopProgress() {
     this._stopProgressUpdates()
+  }
+
+  $videoPlayerSeeking() {
+    this._isSeeking = true
+    this.tag('Spinner').visible = true
+  }
+
+  $videoPlayerSeeked() {
+    this._isSeeking = false
+    this.tag('Spinner').visible = false
   }
   static _states() {
     return [
