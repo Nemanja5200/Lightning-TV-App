@@ -6,6 +6,7 @@ import { IMAGE_PATH } from '../../constance/Images'
 import { PATHS } from '../../constance/paths'
 import ProgressBar from './components/ProgressBar'
 import LoadingScreenComponent from '../LoadingScreenComponent/LoadinScreenComponent'
+import { Gradient } from '@lightningjs/ui-components'
 
 export default class MoviePlayer extends Lightning.Component {
   _isPaused = false
@@ -20,6 +21,15 @@ export default class MoviePlayer extends Lightning.Component {
         w: 1920,
         h: 1080,
         alpha: 1,
+        Bg: {
+          type: Gradient,
+          w: 1920,
+          h: 300,
+          y: 800,
+          zIndex: 0,
+          colorTop: 0x00151515,
+          colorBottom: 0xcc151515,
+        },
         Back: {
           type: PlayerButton,
           w: 86,
