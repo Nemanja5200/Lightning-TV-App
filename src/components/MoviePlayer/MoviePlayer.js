@@ -37,6 +37,7 @@ export default class MoviePlayer extends Lightning.Component {
           x: 115,
           y: 836,
           zIndex: 10,
+          icon: Utils.asset(IMAGE_PATH.PLAYAER_BACK_BTN),
         },
         Controls: {
           w: 312,
@@ -50,6 +51,7 @@ export default class MoviePlayer extends Lightning.Component {
             h: 86,
             flexItem: { marginRight: 45 },
             zIndex: 10,
+            icon: Utils.asset(IMAGE_PATH.PLAYER_PREV),
           },
           PausePlay: {
             type: PlayerButton,
@@ -63,6 +65,7 @@ export default class MoviePlayer extends Lightning.Component {
             w: 86,
             h: 86,
             zIndex: 10,
+            icon: Utils.asset(IMAGE_PATH.PLAYER_FORWARD),
           },
         },
         ProgressBar: {
@@ -117,28 +120,6 @@ export default class MoviePlayer extends Lightning.Component {
   }
 
   _init() {
-    this.patch({
-      ControlsContainer: {
-        Back: {
-          icon: Utils.asset(IMAGE_PATH.PLAYAER_BACK_BTN),
-        },
-        Controls: {
-          Prev: {
-            icon: Utils.asset(IMAGE_PATH.PLAYER_PREV),
-          },
-          PausePlay: {
-            icon: {
-              src: Utils.asset(IMAGE_PATH.PLAYER_PAUSE),
-              width: 70,
-              height: 70,
-            },
-          },
-          Forward: {
-            icon: Utils.asset(IMAGE_PATH.PLAYER_FORWARD),
-          },
-        },
-      },
-    })
     this._setState('Back')
   }
 

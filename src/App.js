@@ -42,7 +42,6 @@ export default class App extends Router.App {
           zIndex: 3,
         },
       },
-
       Background: {
         w: 1920,
         h: 1080,
