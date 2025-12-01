@@ -6,7 +6,7 @@ export default class ProgressBar extends Lightning.Component {
   _skipInterval = null
   _duration = 0
   _skipDirection = null
-  _isSkipping = false
+  _isSeeking = false
   _initialSkip = 1
   _holdSkip = 10
   static _template() {
@@ -110,16 +110,16 @@ export default class ProgressBar extends Lightning.Component {
   }
 
   _startSeeking(direction) {
-    if (this._isSkipping && this._skipDirection === direction) {
+    if (this._isSeeking && this._skipDirection === direction) {
       return
     }
 
-    if (this._isSkipping && this._skipDirection !== direction) {
+    if (this._isSeeking && this._skipDirection !== direction) {
       this._stopSeeking(false)
     }
 
     this.signal('stopProgress')
-    this._isSkipping = true
+    this._isSeeking = true
     this._skipDirection = direction
 
     const incrementBy = (dir, amount) => (dir === 'forward' ? amount : -amount)
@@ -155,7 +155,7 @@ export default class ProgressBar extends Lightning.Component {
       this._previewTime = undefined
     }
 
-    this._isSkipping = false
+    this._isSeeking = false
     this._skipDirection = null
 
     this.signal('startProgress')

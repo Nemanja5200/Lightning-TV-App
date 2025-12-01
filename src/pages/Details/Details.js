@@ -146,18 +146,21 @@ export default class Details extends Lightning.Component {
     const { parsedDetails, parsedCredits } = props
     if (!parsedDetails || !parsedCredits) return
 
-    // Store data and update if template is ready
     if (this.tag('Content.MetaInfo')) {
       this._updateUI()
     }
   }
 
   _init() {
+    this._lastKeyboardState = ELEMENTS.WHATCH_NOW
+    this._isMouseHovering = false
+
     this.BackButton.patch({
       w: 112,
       h: 64,
       props: {
         icon: Utils.asset(IMAGE_PATH.BACK_ICON),
+        buttonId: ELEMENTS.BACK_BUTTON,
       },
       Wrapper: {
         w: 112,
@@ -175,6 +178,7 @@ export default class Details extends Lightning.Component {
       props: {
         label: 'WATCH NOW',
         icon: Utils.asset(IMAGE_PATH.WATCH_NOW),
+        buttonId: ELEMENTS.WHATCH_NOW,
       },
       Wrapper: {
         w: (w) => w,
@@ -235,11 +239,38 @@ export default class Details extends Lightning.Component {
     })
   }
 
+  $buttonHovered(state) {
+    const currentState = this._getState()
+
+    if (state != currentState) {
+      this.tag(this._getState())._unfocus()
+      this._setState(state)
+    }
+  }
+
+  $buttonClicked(state) {
+    const buttonId = state
+    console.log(this)
+    if (buttonId === ELEMENTS.BACK_BUTTON) {
+      const history = Router.getHistory()
+      if (history.length) {
+        Router.back()
+      } else {
+        Router.navigate(PATHS.HOME)
+      }
+    } else if (buttonId === ELEMENTS.WHATCH_NOW) {
+      Router.navigate(PATHS.PLAYER)
+    }
+  }
+
   static _states() {
     return [
       class WatchNow extends this {
         $enter() {
           this._refocus()
+          if (!this._isMouseHovering) {
+            this._lastKeyboardState = ELEMENTS.WHATCH_NOW
+          }
         }
 
         _getFocused() {
@@ -247,6 +278,7 @@ export default class Details extends Lightning.Component {
         }
 
         _handleUp() {
+          this._lastKeyboardState = ELEMENTS.BACK_BUTTON
           this._setState(ELEMENTS.BACK_BUTTON)
           return true
         }
@@ -255,9 +287,13 @@ export default class Details extends Lightning.Component {
           Router.navigate(PATHS.PLAYER)
         }
       },
+
       class BackButton extends this {
         $enter() {
           this._refocus()
+          if (!this._isMouseHovering) {
+            this._lastKeyboardState = ELEMENTS.BACK_BUTTON
+          }
         }
 
         _getFocused() {
@@ -265,13 +301,13 @@ export default class Details extends Lightning.Component {
         }
 
         _handleDown() {
+          this._lastKeyboardState = ELEMENTS.WHATCH_NOW
           this._setState(ELEMENTS.WHATCH_NOW)
           return true
         }
 
         _handleEnter() {
           const history = Router.getHistory()
-
           if (history.length) {
             Router.back()
           } else {
@@ -284,7 +320,6 @@ export default class Details extends Lightning.Component {
 
   _handleBack() {
     const history = Router.getHistory()
-
     if (history.length) {
       Router.back()
     } else {

@@ -6,6 +6,8 @@ export default class Button extends Lightning.Component {
   static _template() {
     return {
       rect: true,
+
+      collision: true,
       shader: {
         type: Lightning.shaders.RoundedRectangle,
         radius: 30,
@@ -41,6 +43,8 @@ export default class Button extends Lightning.Component {
   _init() {
     this._unfocusedColor = COLORS.BUTTON_UNFOCUSED
     this._focusedColor = COLORS.RED
+    this._isFocused = false
+    this._isHoverd = false
   }
 
   set props(config) {
@@ -49,10 +53,12 @@ export default class Button extends Lightning.Component {
       icon = null,
       unfocusedColor = COLORS.BUTTON_UNFOCUSED,
       focusedColor = COLORS.RED,
+      buttonId = null,
     } = config
 
     this._unfocusedColor = unfocusedColor
     this._focusedColor = focusedColor
+    this._buttonId = buttonId
 
     this.patch({
       color: unfocusedColor,
@@ -64,7 +70,6 @@ export default class Button extends Lightning.Component {
         },
       },
     })
-
     if (icon) {
       this.tag(ELEMENTS.ICON).patch({
         src: icon,
@@ -72,6 +77,15 @@ export default class Button extends Lightning.Component {
     } else {
       this.tag(ELEMENTS.ICON).visible = false
     }
+  }
+  _handleHover() {
+    this.fireAncestors('$buttonHovered', this.ref)
+    return false
+  }
+
+  _handleClick() {
+    this.fireAncestors('$buttonClicked', this.ref)
+    return false
   }
 
   _focus() {
@@ -84,5 +98,23 @@ export default class Button extends Lightning.Component {
     this.patch({
       smooth: { color: this._unfocusedColor, scale: 1 },
     })
+  }
+
+  _updateVisualState() {
+    if (this._isFocused || this._isHoverd) {
+      this.patch({
+        smooth: {
+          color: this._focusedColor,
+          scale: this._isHoverd && this._isFocused ? 1.03 : 1.05,
+        },
+      })
+    } else {
+      this.patch({
+        smooth: {
+          color: this._unfocusedColor,
+          scale: 1,
+        },
+      })
+    }
   }
 }

@@ -31,9 +31,9 @@ export default class CardItem extends Lightning.Component {
         fixed: true,
         style: {
           textStyle: {
+            fontFace: 'Inter-Regular',
             fontSize: 24,
             textColor: COLORS.GRAY,
-            fontFace: 'Inter-Regular',
           },
         },
       },
@@ -74,6 +74,7 @@ export default class CardItem extends Lightning.Component {
       style: {
         textStyle: {
           textColor: COLORS.WHITE,
+          fontFace: 'Inter-Regular',
         },
       },
     })
@@ -98,6 +99,7 @@ export default class CardItem extends Lightning.Component {
       style: {
         textStyle: {
           textColor: COLORS.GRAY,
+          fontFace: 'Inter-Regular',
         },
       },
     })

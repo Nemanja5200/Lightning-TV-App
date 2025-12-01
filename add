@@ -1,0 +1,11 @@
+name            deviceinfo                    connection  profile  passphrase
+--------------  ----------------------------  ----------  -------  ----------
+LG21 (default)  prisoner@192.168.51.111:9922  ssh         tv       4BF902    
+emulator        developer@127.0.0.1:6622      ssh         tv                 
+
+** You can modify the device info in the above list, or add new device.
+? Select (Use arrow keys)
+❯ add 
+  modify 
+  remove 
+  set default [14D[14C

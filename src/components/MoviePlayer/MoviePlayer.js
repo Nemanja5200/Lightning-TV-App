@@ -257,8 +257,8 @@ export default class MoviePlayer extends Lightning.Component {
     VideoPlayer.loop(false)
     VideoPlayer.open('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')
     VideoPlayer.play()
-    this._startProgressUpdates()
 
+    this._startProgressUpdates()
     this._resetHideTimer()
   }
 

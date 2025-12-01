@@ -18,7 +18,8 @@
   },
   "scripts": {
     "start": "vite",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "build": "NODE_OPTIONS=--max-old-space-size=6144 vite build"
   },
   "devDependencies": {
     "@babel/core": "^7.7.2",
