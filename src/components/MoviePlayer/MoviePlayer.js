@@ -15,12 +15,15 @@ export default class MoviePlayer extends Lightning.Component {
   _seekTimeout = null
   _hideControlsTimeout = null
   _controlsVisible = true
+  _previousButton = null
+
   static _template() {
     return {
       ControlsContainer: {
         w: 1920,
         h: 1080,
         alpha: 1,
+        zIndex: 10,
         Bg: {
           type: Gradient,
           w: 1920,
@@ -32,6 +35,7 @@ export default class MoviePlayer extends Lightning.Component {
         },
         Back: {
           type: PlayerButton,
+          ref: 'Back',
           w: 86,
           h: 86,
           x: 115,
@@ -47,6 +51,7 @@ export default class MoviePlayer extends Lightning.Component {
           flex: { direction: 'row', alignItems: 'center' },
           Prev: {
             type: PlayerButton,
+            ref: 'Prev',
             w: 86,
             h: 86,
             flexItem: { marginRight: 45 },
@@ -55,6 +60,7 @@ export default class MoviePlayer extends Lightning.Component {
           },
           PausePlay: {
             type: PlayerButton,
+            ref: 'PausePlay',
             w: 95,
             h: 95,
             flexItem: { marginRight: 45 },
@@ -62,6 +68,7 @@ export default class MoviePlayer extends Lightning.Component {
           },
           Forward: {
             type: PlayerButton,
+            ref: 'Forward',
             w: 86,
             h: 86,
             zIndex: 10,
@@ -70,6 +77,7 @@ export default class MoviePlayer extends Lightning.Component {
         },
         ProgressBar: {
           type: ProgressBar,
+          ref: 'ProgressBar',
           x: 115,
           y: 961,
           signals: {
@@ -293,6 +301,7 @@ export default class MoviePlayer extends Lightning.Component {
       this._seekTimeout = null
     }, 500)
   }
+
   _startProgress() {
     this._startProgressUpdates()
   }
@@ -306,6 +315,37 @@ export default class MoviePlayer extends Lightning.Component {
     this.tag('Spinner').visible = true
   }
 
+  $buttonHovered(buttonRef) {
+    console.log('Hovering over:', buttonRef)
+
+    const currentState = this._getState()
+
+    if (buttonRef !== currentState) {
+      if (this._previousButton && this._previousButton._unfocus) {
+        this._previousButton._unfocus()
+      }
+
+      let newButton = null
+
+      if (buttonRef === 'Back') {
+        newButton = this.Back
+      } else if (buttonRef === 'Prev') {
+        newButton = this.Prev
+      } else if (buttonRef === 'PausePlay') {
+        newButton = this.PausePlay
+      } else if (buttonRef === 'Forward') {
+        newButton = this.Forward
+      }
+
+      if (newButton && newButton._focus) {
+        newButton._focus()
+        this._previousButton = newButton
+      }
+
+      this._setState(buttonRef)
+    }
+  }
+
   $videoPlayerSeeked() {
     this._isSeeking = false
     this.tag('Spinner').visible = false
@@ -314,6 +354,7 @@ export default class MoviePlayer extends Lightning.Component {
   $videoPlayerEnded() {
     Router.back()
   }
+
   static _states() {
     return [
       class Back extends this {
@@ -323,7 +364,7 @@ export default class MoviePlayer extends Lightning.Component {
 
         _handleRight() {
           this._handleAnyKey()
-          this._setState('Controls')
+          this._setState('Prev')
           return true
         }
 
@@ -347,6 +388,9 @@ export default class MoviePlayer extends Lightning.Component {
             Router.navigate(PATHS.HOME)
           }
         }
+        _handleClick() {
+          this._handleEnter()
+        }
 
         _captureKey() {
           if (this._handleAnyKey()) {
@@ -358,36 +402,26 @@ export default class MoviePlayer extends Lightning.Component {
         _handleUp() {
           return this._captureKey() || false
         }
+
         _handleLeft() {
           return this._captureKey() || false
         }
       },
 
-      class Controls extends this {
-        $enter() {
-          this._controlIndex = 0
-        }
-
+      class Prev extends this {
         _getFocused() {
-          const controls = [this.Prev, this.PausePlay, this.Forward]
-          return controls[this._controlIndex]
+          return this.Prev
         }
 
         _handleLeft() {
           this._handleAnyKey()
-          if (this._controlIndex > 0) {
-            this._controlIndex--
-          } else {
-            this._setState('Back')
-          }
+          this._setState('Back')
           return true
         }
 
         _handleRight() {
           this._handleAnyKey()
-          if (this._controlIndex < 2) {
-            this._controlIndex++
-          }
+          this._setState('PausePlay')
           return true
         }
 
@@ -399,44 +433,99 @@ export default class MoviePlayer extends Lightning.Component {
 
         _handleEnter() {
           this._handleAnyKey()
-          const buttons = ['Prev', 'PausePlay', 'Forward']
-          const focusedButton = buttons[this._controlIndex]
+          VideoPlayer.skip(-5)
+          return true
+        }
 
-          switch (focusedButton) {
-            case 'Prev':
-              VideoPlayer.skip(-5)
-              break
-            case 'PausePlay':
-              this._isPaused = !this._isPaused
-              VideoPlayer.playPause()
-              this._updatePlayPauseIcon()
+        _handleClick() {
+          this._handleEnter()
+        }
+        _handleUp() {
+          return this._handleAnyKey() || false
+        }
+      },
 
-              if (this._isPaused) {
-                this._showControls()
-                if (this._hideControlsTimeout) {
-                  clearTimeout(this._hideControlsTimeout)
-                  this._hideControlsTimeout = null
-                }
-              } else {
-                this._resetHideTimer()
-              }
-              break
-            case 'Forward':
-              VideoPlayer.skip(+5)
-              break
+      // Pause/Play button state
+      class PausePlay extends this {
+        _getFocused() {
+          return this.PausePlay
+        }
+
+        _handleLeft() {
+          this._handleAnyKey()
+          this._setState('Prev')
+          return true
+        }
+
+        _handleRight() {
+          this._handleAnyKey()
+          this._setState('Forward')
+          return true
+        }
+
+        _handleDown() {
+          this._handleAnyKey()
+          this._setState('ProgressBar')
+          return true
+        }
+        _handleClick() {
+          this._handleEnter()
+        }
+        _handleEnter() {
+          this._handleAnyKey()
+          this._isPaused = !this._isPaused
+          VideoPlayer.playPause()
+          this._updatePlayPauseIcon()
+
+          if (this._isPaused) {
+            this._showControls()
+            if (this._hideControlsTimeout) {
+              clearTimeout(this._hideControlsTimeout)
+              this._hideControlsTimeout = null
+            }
+          } else {
+            this._resetHideTimer()
           }
           return true
         }
 
-        _captureKey() {
-          if (this._handleAnyKey()) {
-            return true
-          }
-          return false
+        _handleUp() {
+          return this._handleAnyKey() || false
+        }
+      },
+
+      // Forward button state
+      class Forward extends this {
+        _getFocused() {
+          return this.Forward
         }
 
+        _handleLeft() {
+          this._handleAnyKey()
+          this._setState('PausePlay')
+          return true
+        }
+
+        _handleRight() {
+          return this._handleAnyKey() || false
+        }
+
+        _handleDown() {
+          this._handleAnyKey()
+          this._setState('ProgressBar')
+          return true
+        }
+
+        _handleEnter() {
+          this._handleAnyKey()
+          VideoPlayer.skip(+5)
+          return true
+        }
+        _handleClick() {
+          this._handleEnter()
+        }
         _handleUp() {
-          return this._captureKey() || false
+          return this._handleAnyKey() || false
         }
       },
 
@@ -447,7 +536,7 @@ export default class MoviePlayer extends Lightning.Component {
 
         _handleUp() {
           this._handleAnyKey()
-          this._setState('Controls')
+          this._setState('PausePlay')
           return true
         }
 

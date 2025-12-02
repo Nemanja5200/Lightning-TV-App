@@ -4,6 +4,7 @@ import { HorizontalContainer } from '../../components'
 import { ELEMENTS } from '../../constance/Elements'
 import { Widget } from './components'
 import { ANCHORES } from '../../constance/Anchors'
+import Movies from '../Movies/Movies'
 
 export default class Home extends Lightning.Component {
   static _template() {
@@ -22,6 +23,7 @@ export default class Home extends Lightning.Component {
         w: 1241,
         Movies: {
           type: HorizontalContainer,
+          collision: true,
           w: 1241,
           h: 464,
           props: {
@@ -33,6 +35,7 @@ export default class Home extends Lightning.Component {
         },
         Series: {
           type: HorizontalContainer,
+          collision: true,
           w: 1241,
           h: 464,
           y: 430,
@@ -48,6 +51,7 @@ export default class Home extends Lightning.Component {
         type: Widget,
         x: 1415,
         y: 122,
+        collision: true,
       },
     }
   }
@@ -85,7 +89,6 @@ export default class Home extends Lightning.Component {
     }
 
     this._setState(ELEMENTS.MOVIES)
-    Router.focusWidget(ELEMENTS.NAVBAR)
   }
 
   _active() {
@@ -112,6 +115,16 @@ export default class Home extends Lightning.Component {
       return
     }
     e.preventDefault()
+  }
+  $handleHoverState(ref) {
+    const currentState = this._getState()
+    console.log('WSTV', ref)
+    console.log('CurrState', this._getState())
+
+    if (ref !== currentState) {
+      if (currentState) this.tag(currentState)._unfocus()
+      this._setState(ref)
+    }
   }
 
   static _states() {

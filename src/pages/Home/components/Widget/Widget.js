@@ -21,6 +21,7 @@ export default class Widget extends Lightning.Component {
       },
       WidgetCards: {
         type: VerticalContainer,
+        collision: true,
       },
     }
   }
@@ -50,8 +51,17 @@ export default class Widget extends Lightning.Component {
       },
     })
   }
-
   _getFocused() {
     return this.tag('WidgetCards')
+  }
+
+  $handleHoverState(ref) {
+    console.log('Im Here ')
+    const currentState = this._getState()
+    if (ref !== currentState) {
+      if (currentState) this.tag(currentState)._unfocus()
+      this._setState(ref)
+    }
+    this.fireAncestors('$handleHoverState', this.ref)
   }
 }

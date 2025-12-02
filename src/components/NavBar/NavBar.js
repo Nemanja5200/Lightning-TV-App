@@ -6,10 +6,11 @@ import NavElement from './NavElement.js'
 export default class Navbar extends Lightning.Component {
   static _template() {
     return {
-      w: 1841,
+      w: 300,
       h: 60,
       x: 32,
       y: 32,
+      collision: true,
       flex: {
         direction: 'row',
         justifyContent: 'flex-start',
@@ -22,6 +23,7 @@ export default class Navbar extends Lightning.Component {
       },
       NavItems: {
         type: HorizontalContainer,
+        collision: true,
         x: 80,
         w: 674,
         h: 49,

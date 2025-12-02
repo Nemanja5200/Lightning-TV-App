@@ -7,6 +7,7 @@ export default class PlayerButton extends Lightning.Component {
     return {
       w: 86,
       h: 86,
+      collision: true,
       Ellipse: {
         w: (w) => w,
         h: (h) => h,
@@ -59,5 +60,11 @@ export default class PlayerButton extends Lightning.Component {
     this.tag('Icon').setSmooth('color', 0x4dffffff, { duration: 0.3 })
     this.tag('Background').setSmooth('alpha', 0, { duration: 0.3 })
     this.tag('EllipseBorder').setSmooth('color', 0x4dffffff, { duration: 0.3 })
+  }
+
+  _handleHover() {
+    this._focus()
+    console.log('current ref:', this.ref)
+    this.fireAncestors('$buttonHovered', this.ref)
   }
 }

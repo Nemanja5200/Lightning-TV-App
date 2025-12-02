@@ -2,12 +2,15 @@ import { Lightning, Router } from '@lightningjs/sdk'
 import { COLORS } from '../../constance/Colors'
 import { ANCHORES } from '../../constance/Anchors'
 import { NameToRoute } from '../../constance/paths'
+import { ELEMENTS } from '../../constance/Elements'
 
 export default class NavElement extends Lightning.Component {
   _isActive = false
   static _template() {
     return {
       h: 49,
+      w: 100,
+      collision: true,
       flexItem: { marginRight: 130 },
       Label: {
         text: {
@@ -102,5 +105,20 @@ export default class NavElement extends Lightning.Component {
   _handleEnter() {
     this.fireAncestors('$navItemActivated', this.route)
     this.fireAncestors(ANCHORES.NAV_SELECT_ITEM, this._item.label)
+  }
+
+  _handleHover() {
+    console.log('NavBar')
+    this._focus()
+    this.fireAncestors('$handleItemHover', this.parent.children.indexOf(this))
+    Router.focusWidget(ELEMENTS.NAVBAR)
+  }
+
+  _handleClick() {
+    this._handleEnter()
+  }
+
+  _handleUnhover() {
+    Router.focusPage()
   }
 }

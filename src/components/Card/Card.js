@@ -10,6 +10,7 @@ export default class CardItem extends Lightning.Component {
     return {
       rect: true,
       color: COLORS.TRANSPARENT,
+      collision: true,
       flexItem: {
         marginRight: 24,
       },
@@ -110,5 +111,15 @@ export default class CardItem extends Lightning.Component {
   _handleEnter() {
     Router.navigate(`${PATHS.DETAILS}/${this._item.mediaType}/${this._item.id}`)
     return true
+  }
+
+  _handleHover() {
+    this._focus()
+    this.fireAncestors('$handleItemHover', this.parent.children.indexOf(this))
+    console.log(this.parent.children.indexOf(this))
+  }
+
+  _handleClick() {
+    this._handleEnter()
   }
 }

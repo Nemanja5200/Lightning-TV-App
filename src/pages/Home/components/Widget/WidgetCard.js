@@ -5,6 +5,7 @@ export default class WidgetCard extends Lightning.Component {
   static _template() {
     return {
       h: 136,
+      collision: true,
       flexItem: { marginBottom: 10 },
       FocusBox: {
         x: -4,
@@ -67,6 +68,12 @@ export default class WidgetCard extends Lightning.Component {
         },
       },
     })
+  }
+
+  _handleHover() {
+    this._focus()
+    this.fireAncestors('$handleItemHover', this.parent.children.indexOf(this))
+    console.log(this.parent.children.indexOf(this))
   }
 
   _focus() {

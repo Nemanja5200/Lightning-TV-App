@@ -5,7 +5,9 @@ export default class VerticalContainer extends Lightning.Component {
     items: [],
     title: '',
     enableScroll: false,
+    scrollMargin: 20,
   }
+
   _focusedIndex = 0
   _scrollPosition = 0
 
@@ -41,14 +43,20 @@ export default class VerticalContainer extends Lightning.Component {
       titleMarginBottom,
       titleMarginTop,
       titleAlign,
+      scrollMargin,
       ...rest
     } = props
 
     this._props = { ...this._props, ...rest }
 
+    if (scrollMargin !== undefined) {
+      this._props.scrollMargin = scrollMargin
+    }
+
     if (w) this.patch({ w })
     if (h) this.patch({ h })
 
+    // naslov
     if (title && title !== '') {
       const alignment = titleAlign || 'left'
       const marginBottom = titleMarginBottom !== undefined ? titleMarginBottom : 20
@@ -88,6 +96,7 @@ export default class VerticalContainer extends Lightning.Component {
       this.Title.patch({ visible: false })
     }
 
+    // dodavanje itema
     if (items && items !== this._props.items) {
       this._props.items = items
       this.Items.childList.clear()
@@ -112,19 +121,25 @@ export default class VerticalContainer extends Lightning.Component {
 
   _reCalibrateScroll() {
     if (!this._props.enableScroll || !this.h) return
+
     this.stage.update()
+
     const currentFocus = this.Items.children[this._focusedIndex]
     if (!currentFocus) return
+
     const containerHeight = this.finalH
     const itemY = currentFocus.finalY
     const itemH = currentFocus.finalH
+    const margin = this._props.scrollMargin
+
     const itemBottom = itemY + itemH + this.Items.y
     const itemTop = itemY + this.Items.y
+
     if (itemBottom > containerHeight) {
-      this._scrollPosition -= itemBottom - containerHeight + 20
+      this._scrollPosition -= itemBottom - containerHeight + margin
       this.Items.smooth = { y: this._scrollPosition }
     } else if (itemTop < 0) {
-      this._scrollPosition -= itemTop - 20
+      this._scrollPosition -= itemTop - margin
       this.Items.smooth = { y: this._scrollPosition }
     }
   }
@@ -165,6 +180,22 @@ export default class VerticalContainer extends Lightning.Component {
     if (this._focusedIndex >= 0 && this._focusedIndex < items.length) {
       this.Items.children[this._focusedIndex]?._focus()
     }
+  }
+
+  _unfocus() {
+    this.Items.children[this._focusedIndex]?._unfocus()
+  }
+
+  $handleItemHover(index) {
+    if (this._focusedIndex !== index) {
+      this.Items.children[this._focusedIndex]?._unfocus()
+      this._focusedIndex = index
+    }
+    this._reCalibrateScroll()
+
+    // pošalji svoje ime (MoviesRow ili SeriesRow)
+    console.log(this.ref)
+    this.fireAncestors('$handleHoverState', this.ref)
   }
 
   _unfocus() {
