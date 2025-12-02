@@ -194,6 +194,11 @@ export default class MoviePlayer extends Lightning.Component {
     })
   }
 
+  _init() {
+    window.addEventListener('mousemove', () => {
+      this._showControls()
+    })
+  }
   _updateProgress() {
     if (this._isSeeking) {
       return
