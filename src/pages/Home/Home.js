@@ -89,6 +89,7 @@ export default class Home extends Lightning.Component {
     }
 
     this._setState(ELEMENTS.MOVIES)
+    Router.focusWidget(ELEMENTS.NAVBAR)
   }
 
   _active() {
@@ -117,6 +118,9 @@ export default class Home extends Lightning.Component {
     e.preventDefault()
   }
   $handleHoverState(ref) {
+    if (Router.getActiveWidget()) {
+      Router.focusPage()
+    }
     const currentState = this._getState()
     console.log('WSTV', ref)
     console.log('CurrState', this._getState())

@@ -194,6 +194,7 @@ export default class HorizontalContainer extends Lightning.Component {
     this._reCalibrateScroll()
 
     this.fireAncestors('$handleHoverState', this.ref)
+    this.signal('horizontalContainerIndexChange', this._focusedIndex)
   }
 
   _unfocus() {

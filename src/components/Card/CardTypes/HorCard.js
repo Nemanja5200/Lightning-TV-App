@@ -7,6 +7,7 @@ export default class HorCard extends CardItem {
       ...parentTemplate,
       w: 440,
       h: 330,
+      zIndex: 5,
       Image: {
         w: (w) => w,
         h: (h) => h - 64,

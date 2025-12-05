@@ -13,6 +13,7 @@ export default class ProgressBar extends Lightning.Component {
     return {
       w: 1690,
       h: 156,
+      collision: true,
       CurrentTime: {
         x: 0,
         y: 0,
@@ -198,5 +199,12 @@ export default class ProgressBar extends Lightning.Component {
   _handleDown() {
     this._stopSeeking()
     return true
+  }
+
+  _handleHover() {
+    console.log('Progress Bar', this.ref)
+    this._focus()
+    console.log('current ref:', this.ref)
+    this.fireAncestors('$buttonHovered', this.ref)
   }
 }

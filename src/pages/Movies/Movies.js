@@ -10,6 +10,7 @@ export default class Movies extends Lightning.Component {
 
   static _template() {
     return {
+      collision: true,
       Background: {
         w: 1920,
         h: 1080,
@@ -81,7 +82,10 @@ export default class Movies extends Lightning.Component {
           MoviesContainer: {
             y: 697,
             x: 45,
+            w: 1920,
+            h: 125,
             zIndex: 5,
+            collision: true,
             type: HorizontalContainer,
             signals: {
               horizontalContainerIndexChange: '_horizontalContainerIndexChange',
@@ -144,6 +148,7 @@ export default class Movies extends Lightning.Component {
     }
   }
   _horizontalContainerIndexChange(newIndex) {
+    console.log('Im changed')
     if (this._updateTimeout) {
       clearTimeout(this._updateTimeout)
     }
